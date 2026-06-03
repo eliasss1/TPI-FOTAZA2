@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  div.row.justify-content-center
+    div.col-md-6
+      div.card.shadow
+        div.card-body
+          h2.text-center.mb-4 Iniciar Sesión
+          
+          form(action="/auth/login" method="POST")
+            div.mb-3
+              label.form-label(for="email") Correo Electrónico
+              input#email.form-control(type="email" name="email" required placeholder="ejemplo@correo.com")
+            
+            div.mb-3
+              label.form-label(for="password") Contraseña
+              input#password.form-control(type="password" name="password" required)
+            
+            button.btn.btn-success.w-100(type="submit") Ingresar
+            
+          div.mt-3.text-center
+            p ¿No tienes cuenta? 
+              a(href="/auth/registro") Regístrate aquí
