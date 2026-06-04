@@ -6,11 +6,37 @@ module.exports = {
         res.render('login', { titulo: 'Iniciar Sesion'});
 
     },
-    // Procesar el login
     procesarLogin: (req, res) => {
-        const { username, password } = req.body;       
-        console.log(`Intentando loguear a: ${username}`);
-        res.redirect('/');        
+        try {
+        const usuario = await Usuario.findOne({ where: { email } });
+        if (!usuario) {
+            return res.render('login', { titulo: 'Iniciar Sesion', error: 'Email o contraseña incorrectos' });
+        }
+
+        // Verificar que la cuenta esté activa
+        if (!usuario.activo) {
+            return res.render('login', { titulo: 'Iniciar Sesion', error: 'Tu cuenta está inactiva' });
+        }
+
+        // Comparar contraseña
+        const passwordOk = await bcrypt.compare(password, usuario.password);
+        if (!passwordOk) {
+            return res.render('login', { titulo: 'Iniciar Sesion', error: 'Email o contraseña incorrectos' });
+        }
+
+        // Guardar en sesión
+        req.session.usuario = {
+            id: usuario.id,
+            username: usuario.username,
+            email: usuario.email,
+            rol: usuario.rol
+        };
+
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error en login:', error);
+        res.render('login', { titulo: 'Iniciar Sesion', error: 'Ocurrió un error al iniciar sesión' });
+    }
     },
     mostrarRegistro: (req, res) => {
         res.render('registro', { titulo: 'Crear Cuenta' });
@@ -32,7 +58,7 @@ module.exports = {
             console.log(`Usuario ${username} creado con éxito en la BD.`);           
             // Si todo sale bien, lo mandamos a que inicie sesión
             res.redirect('/auth/login');
-            // Si no, mostramos un error, no se si es necesario, pero bueno, por las dudas xd
+            // Si no, mostramos un error, es necesario poner el catch para que no se caiga el servidor
         } catch (error) {
             console.error('Error al registrar usuario:', error);
             res.render('registro', { titulo: 'Crear Cuenta', error: 'Ocurrió un error al registrarse' });

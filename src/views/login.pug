@@ -6,6 +6,9 @@ block content
       div.card.shadow
         div.card-body
           h2.text-center.mb-4 Iniciar Sesión
+          if error
+          div.alert.alert-danger= error  
+          form(action="/auth/login" method="POST")
           
           form(action="/auth/login" method="POST")
             div.mb-3

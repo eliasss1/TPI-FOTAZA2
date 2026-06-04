@@ -24,6 +24,7 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "pg": "^8.21.0",
     "pg-hstore": "^2.3.4",
     "pug": "^3.0.4",
