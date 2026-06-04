@@ -17,13 +17,13 @@ Imagen.belongsTo(Publicacion, {foreignKey: 'publicacion_id'});
 
 //relacion de seguidores
 Usuario.belongsToMany(Usuario, {
-    trough: 'seguidores',
+    through: 'seguidores',
     as: 'Seguidos',
     foreignKey: 'seguidor_id',
     otherKey: 'seguido_id'
 });
 Usuario.belongsToMany(Usuario, {
-    trough: 'seguidores',
+    through: 'seguidores',
     as: 'Seguidor',
     foreignKey: 'seguido_id',
     otherKey: 'seguidor_id',

@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:init": "node src/config/init-db.js",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,8 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mysql2": "^3.22.3",
+    "pg": "^8.21.0",
+    "pg-hstore": "^2.3.4",
     "pug": "^3.0.4",
     "sequelize": "^6.37.8"
   },
