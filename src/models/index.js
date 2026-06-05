@@ -5,6 +5,10 @@ const sequelize = require('../config/database');
 const Usuario = require('./usuario');
 const Publicacion = require('./publicacion');
 const Imagen = require('./imagen');
+const Comentario = require('./comentario');
+const Etiqueta = require('./etiqueta');
+const Denuncia = require('./denuncia');
+
 
 // asociaciones
 //un usuario tiene muchas publicaciones
@@ -29,9 +33,30 @@ Usuario.belongsToMany(Usuario, {
     otherKey: 'seguidor_id',
 });
 
+// comentario (un usuario hace muchos comentarios, una publicacion tiene muchos comentarios)
+Usuario.hasMany(Comentario, { foreignKey: 'usuario_id'});
+Comentario.belongsTo( Usuario, { foreignKey: 'usuario_id', as: 'autor'});
+
+Publicacion.hasMany(Comentario, { foreignKey: 'publicacion_id', onDelete: 'CASCADE' });
+Comentario.belongsTo(Publicacion, { foreignKey: 'publicacion_id' });
+
+// etiquetas
+Publicacion.belongsToMany(Etiqueta, { through: 'publicacion_etiquetas', foreignKey: 'publicacion_id'});
+Etiqueta.belongsToMany(Publicacion, { through: 'publicacion_etiquetas', foreignKey: 'etiquetas_id'});
+
+// denuncias
+Usuario.hasMany(Denuncia, { foreignKey: 'usuario_id', as: 'denuncias_hechas'});
+Denuncia.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'denunciante'});
+
+Publicacion.hasMany(Denuncia, { foreignKey: 'publicacion_id', onDelete: 'CASCADE'});
+Denuncia.belongsTo(Publicacion, { foreignKey: 'publicacion_id'});
+
 module.exports = {
     sequelize,
     Usuario,
     Publicacion,
-    Imagen
+    Imagen,
+    Comentario,
+    Etiqueta,
+    Denuncia
 };
