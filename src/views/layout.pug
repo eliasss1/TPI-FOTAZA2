@@ -14,9 +14,30 @@ html(lang="es")
           a.btn.btn-outline-light.btn-sm(href="/auth/login") Iniciar Sesión
           a.btn.btn-primary.btn-sm(href="/auth/registro") Registrarse
     //- Poner las vistas acá
-    main.container.d-flex.flex-column.justify-content-center.align-items-center(style="min-height: 85vh;")
-      div.w-100
-        block content
+    main.container-fluid.px-4.mt-4.d-flex.flex-column(style="min-height: calc(100vh - 9rem);")
+
+
+      div.w-100.d-flex.flex-column.flex-md-row.gap-4.align-items-stretch.h-100
+        aside.col-12.col-md-3.bg-white.shadow-lg.p-4.d-flex.flex-column
+          h5.fw-bold.mb-3 Menú
+          ul.nav.flex-column.gap-2
+            li.nav-item
+              a.nav-link.p-2.link-dark.fw-semibold(href="/") 
+                i.bi.bi-house-door.me-2
+
+                |  Inicio
+            li.nav-item
+              a.nav-link.p-2.link-dark.fw-semibold(href="/nueva-publicacion") 
+                i.bi.bi-plus-circle.me-2
+
+                |  Subir Foto
+            li.nav-item
+              a.nav-link.p-2.link-dark.fw-semibold(href="/perfil") 
+                i.bi.bi-person.me-2
+
+                |  Mi Perfil
+        section.col-12.col-md-9.d-flex.flex-column
+          block content
     footer.bg-dark.text-light.text-center.py-3.mt-auto
       div.container
         p.mb-0 &copy; 2024 FOTAZA 2. Desarrollado por Maxi, Elias y Vic.
