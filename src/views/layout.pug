@@ -6,6 +6,31 @@ html(lang="es")
     title FOTAZA 2
     //- Agregamos Bootstrap para que los pibes tengan clases CSS listas para usar
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css")
+
+    style. 
+      .menu-colapsable {
+        width: 60px;
+        white-space: nowrap;
+        overflow: hidden; 
+        transition: width 0.3s ease;
+      }
+
+      .menu-colapsable .menu-icono {
+        width: 32px; 
+        height: 32px; 
+        object-fit: contain;
+        transition: transform 0.3s ease;
+      }
+
+      .menu-colapsable:hover .menu-icono {
+        transform: scale(1.1);
+        
+      }
+
+      .menu-colapsable:hover{
+        width: 300px;
+      }
+
   body.bg-light
     nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
       div.container
@@ -14,29 +39,26 @@ html(lang="es")
           a.btn.btn-outline-light.btn-sm(href="/auth/login") Iniciar Sesión
           a.btn.btn-primary.btn-sm(href="/auth/registro") Registrarse
     //- Poner las vistas acá
-    main.container-fluid.px-4.mt-4.d-flex.flex-column(style="min-height: calc(100vh - 9rem);")
-
-
-      div.w-100.d-flex.flex-column.flex-md-row.gap-4.align-items-stretch.h-100
-        aside.col-12.col-md-3.bg-white.shadow-lg.p-4.d-flex.flex-column
+    main.d-flex(style="min-height: 85vh")
+      div.mb-auto.mt-auto
+        aside.menu-colapsable.flex-column.shadow-lg.bg-white(style="height: 850px")
           h5.fw-bold.mb-3 Menú
           ul.nav.flex-column.gap-2
             li.nav-item
               a.nav-link.p-2.link-dark.fw-semibold(href="/") 
-                i.bi.bi-house-door.me-2
-
-                |  Inicio
+                img.menu-icono.me-4(src="/images/casa.png" alt="Icono")
+                span Inicio
             li.nav-item
               a.nav-link.p-2.link-dark.fw-semibold(href="/nueva-publicacion") 
                 i.bi.bi-plus-circle.me-2
 
                 |  Subir Foto
             li.nav-item
-              a.nav-link.p-2.link-dark.fw-semibold(href="/perfil") 
+              a.nav-link.p-2.link-dark.fw-semibold(href="/usuario") 
                 i.bi.bi-person.me-2
 
                 |  Mi Perfil
-        section.col-12.col-md-9.d-flex.flex-column
+      div.container.mt-auto.mb-auto  
           block content
     footer.bg-dark.text-light.text-center.py-3.mt-auto
       div.container

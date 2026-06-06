@@ -34,3 +34,7 @@ const Port = process.env.Port || 3000;
 app.listen(Port, () => {
     console.log(`Servidor iniciado en el puerto ${Port}`);
 });
+
+app.get('/nueva-publicacion', (req, res) => {
+    res.render('nueva-publicacion'); 
+});

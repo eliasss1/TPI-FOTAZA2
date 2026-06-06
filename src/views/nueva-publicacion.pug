@@ -1,4 +1,32 @@
 extends layout
 
 block content
-    div.container.bg-white.shadow-lg.p-5.my-4(style="min-height: calc(100vh - 12rem); d-flex flex-column justify-content-center;")
+        div.d-flex.justify-content-around.bg-white.shadow-lg.gap-2(style="height: calc(100vh - 9rem)")
+                div.justify-content-center.align-items-center.mt-5 
+                    h1 Crea tu publicacion
+                    
+                form.flex-column.d-flex.mt-auto.mb-auto(action="/publicaciones/crear" method="POST" enctype="multipart/form-data")
+
+                    //Aca le pido el titulo muchaches
+                    .mb-3
+                        label.form-label(for="titulo") Titulo de la publicacion 
+                        input#titulo.form-control(type="text" name="titulo" placeholder="ej: atardecer en las sierras" required)
+                    .mb-3
+                        label.form-label(for="imagenes") Descripcion corta 
+                        input#imagenes.form-control(type="file" name="imagenes" accept="image/*" multiple required)
+                        .form-text Podes seleccionar mas de una!
+                    .mb-3
+                        label.form-label.fw-semibold(for="etiquetas") Etiquetas / Tags
+                        input#etiquetas.form-control(type="text" name="etiquetas" placeholder="Ej: paisajes, naturaleza, verano (separadas por comas)" required)
+                        .form-text Escribí las palabras clave separadas por comas para clasificar tu contenido.
+                    .mb-3
+                        label.form-label.fw-semibold(for="tipo_licencia") Tipo de Licencia
+                        select#tipo_licencia.form-select(name="tipo_licencia" required)
+                        option(value="sin_copyright" selected) Sin Copyright (Contenido Público)
+                        option(value="con_copyright") Con Copyright (Protegida)
+                    .mb-3
+                        label.form-label.fw-semibold(for="marca_agua") Texto de la Marca de Agua
+                        input#marca_agua.form-control(type="text" name="marca_agua" placeholder="Ej: © Tu Nombre o Firma")
+                        .form-text Este texto se aplicará automáticamente como marca de agua si seleccionaste una licencia 'Con Copyright'
+                    
+                    button.btn.btn-primary(type="submit") Publicar Fotaza
