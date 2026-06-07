@@ -27,37 +27,45 @@ html(lang="es")
         
       }
 
+      .barra-encabezado {
+        height: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        transition: height 0.3s ease;
+      }
+
+      .barra-encabezado:hover {
+        height: 60px;
+      }
+
       .menu-colapsable:hover{
         width: 300px;
       }
 
   body.bg-light
-    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
-      div.container
+    nav.barra-encabezado.navbar.navbar-dark.bg-dark
+      div.container.mt-1
         a.navbar-brand(href="/") FOTAZA 2
         div.ms-auto.d-flex.gap-2
           a.btn.btn-outline-light.btn-sm(href="/auth/login") Iniciar Sesión
           a.btn.btn-primary.btn-sm(href="/auth/registro") Registrarse
     //- Poner las vistas acá
     main.d-flex(style="min-height: 85vh")
-      div.mb-auto.mt-auto
-        aside.menu-colapsable.flex-column.shadow-lg.bg-white(style="height: 850px")
-          h5.fw-bold.mb-3 Menú
+      div
+        aside.menu-colapsable.flex-column.shadow-lg.bg-white(style="height: 840px")
           ul.nav.flex-column.gap-2
             li.nav-item
               a.nav-link.p-2.link-dark.fw-semibold(href="/") 
-                img.menu-icono.me-4(src="/images/casa.png" alt="Icono")
+                img.menu-icono.ms-2.me-3(src="/images/casa.png" alt="Icono")
                 span Inicio
             li.nav-item
               a.nav-link.p-2.link-dark.fw-semibold(href="/nueva-publicacion") 
-                i.bi.bi-plus-circle.me-2
-
-                |  Subir Foto
+                img.menu-icono.ms-2.me-3(src="/images/Subir.png" alt="Icono")
+                span Subir Foto
             li.nav-item
-              a.nav-link.p-2.link-dark.fw-semibold(href="/usuario") 
-                i.bi.bi-person.me-2
-
-                |  Mi Perfil
+              a.nav-link.p-2.link-dark.fw-semibold(href="/perfil") 
+                img.menu-icono.ms-2.me-3(src="images/usuario.png")
+                span Mi Perfil
       div.container.mt-auto.mb-auto  
           block content
     footer.bg-dark.text-light.text-center.py-3.mt-auto
@@ -65,3 +73,14 @@ html(lang="es")
         p.mb-0 &copy; 2024 FOTAZA 2. Desarrollado por Maxi, Elias y Vic.
 
     script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js")
+
+//script.
+  document.addEventListener('mousemove', (e) => {
+    const barra = document.querySelector('.barra-encabezado');
+    const distanciaAlTecho = e.clientY; 
+    if (distanciaAlTecho < 90) {   
+      barra.style.height = '60px';
+    } else {
+      barra.style.height = '0px';
+    }
+  });

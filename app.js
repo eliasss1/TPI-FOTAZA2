@@ -38,3 +38,7 @@ app.listen(Port, () => {
 app.get('/nueva-publicacion', (req, res) => {
     res.render('nueva-publicacion'); 
 });
+
+app.get('/perfil', (req, res) => {
+    res.render('perfil');
+});
