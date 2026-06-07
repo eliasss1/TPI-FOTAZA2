@@ -1,4 +1,44 @@
 extends layout
 
 block content
-    div.container.d-flex.bg-white.shadow-lg(style="min-height: calc(100vh - 9rem);")
+    div.container.bg-light.shadow-lg.p-2(style="min-height: calc(100vh - 9rem);")
+        h1.text-center Moderacion
+        div.d-flex.aling-items-start.gap-4 
+
+            //Esta es la barra lateral que flota
+            div.flex-grow-1.p-2.bg-white.shadow-lg(style="width: 200px; height: 700px; margin-left: -80px")
+                h5.fw-bold.mb-3 Menú de Control
+                ul.nav.flex-column.gap-2
+                    li.nav-item
+                        a.nav-link.link-dark.active.fw-semibold(href="#") Denuncias Recibidas
+                    li.nav-item
+                        a.nav-link.link-dark(href="#") Historial de Bajas
+                    li.nav-item
+                        a.nav-link.link-dark(href="#") Usuarios Inactivos
+
+            div.d-flex.flex-column.p-1.bg-white.shadow-lg(style="width: 1100px; height: 700px")
+
+                //Aca empieza lo que seria la denuncia, ahora lo pego asi pero dps se podra mdoificar, esta de ejemplo
+                div.d-flex.border-bottom.border-1.bg-light(style="height: 60px; overflow: hidden; white-space: nowrap")
+                    div.border-end.border-2.px-2
+                        h5.card-title.fw-bold Foto Ejemplo Denunciada
+                        p.card-text.text-muted Subido por: @usuario_facha
+                    div.px-2
+                        p.text-danger.fw-semibold.mb-2 Motivo: "Contenido inapropiado / Copyright"
+                        p.small.text-secondary Justificación: "El usuario se robó esta foto de mi feed de Instagram sin permiso."
+                    div.d-flex.px-5.py-2.gap-2 
+                        button.btn.btn-primary(style="height: 40px;") Rechazar
+                        button.btn.btn-primary(style="height: 40px;") Aceptar
+
+                div.d-flex.border-bottom.border-1.bg-light(style="height: 60px; overflow: hidden; white-space: nowrap")
+                    div.border-end.border-2.px-2
+                        h5.card-title.fw-bold Foto Ejemplo Denunciada
+                        p.card-text.text-muted Subido por: @usuario_facha
+                    div.px-2
+                        p.text-danger.fw-semibold.mb-2 Motivo: "Contenido inapropiado / Copyright"
+                        p.small.text-secondary Justificación: "El usuario se robó esta foto de mi feed de Instagram sin permiso."
+                    div.d-flex.px-5.py-2.gap-2 
+                        button.btn.btn-primary(style="height: 40px;") Rechazar
+                        button.btn.btn-primary(style="height: 40px;") Aceptar
+
+
