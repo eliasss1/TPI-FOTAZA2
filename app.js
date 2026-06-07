@@ -47,3 +47,15 @@ app.get('/nueva-publicacion', (req, res) => {
 app.get('/perfil', (req, res) => {
     res.render('perfil');
 });
+
+app.get('/moderacion', (req, res) => {
+    res.render('moderacion');
+});
+
+app.get('/notificaciones', (req, res) => {
+    res.render('notificaciones');
+});
+
+app.get('/colecciones', (req, res) => {
+    res.render('colecciones');
+});
