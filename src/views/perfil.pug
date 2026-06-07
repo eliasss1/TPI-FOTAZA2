@@ -1,3 +1,84 @@
 extends layout
 
 block content
+    div.container.d-flex.flex-column.bg-white.shadow-lg.p-2(style="min-height: calc(100vh - 9rem)")
+
+        .row.mx-2.my-3
+            div.col-md-3.card.p-1(style="width: 170px; height: 170px")
+                img.mx-auto.my-auto(style="height: 140px; width: 140px" src="/images/usuario.png")
+            div.col-md-5.ms-4.d-flex.border-start.border-4
+                .row.d-flex.w-100(style="max-width: 100%;")
+                    h1.col-md-5 Username
+                    h5.col-md-3.ms-1.mt-1 seguidores
+                    h5.col-md-3.ms-1.mt-1 seguidos
+                    h5 Nombre real completo
+                    p.card-text.text-muted.text-truncate Biografia corta laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    div.dropdown.d-inline-block   
+                        button#btnDrop1.btn.btn-primary.mt-1.dropdown-toggle(type="button" data-bs-toggle="dropdown" style="width: 100px") Editar
+                        .dropdown-menu.p-3.shadow-lg(aria-labelledby="btnDrop1" style="width: 300px; position: absolute;")
+                            form
+                                .mb-3
+                                    label.form-label(for="username") Username
+                                    input.form-control(type="text" placeholder="Pepito123")
+                                .mb-3
+                                    label.form-label(for="nombre") Nombre real completo
+                                    input.form-control(type="text" placeholder="Pepito Lujan")
+                                .mb-3
+                                    label.form-label(for="biografia") Biografia Corta
+                                    input.form-control(type="text" rows="2" placeholder="Ayer me comi un sapito")
+                                .justify-content-end
+                                    button.btn.btn-primary.btn-success(type="submit") Guardar cambios
+                                    
+        //Fua loco quiero ordenar un toque la cabeza es una banda, esto que esta aca abajo es para mostrar las fotos subidas, es otra fila con flex-grow-1 para q se extienda todo lo que 
+        //le permite el container o eso jaja
+        .row.flex-grow-1.mx-2.my-3
+            //Aca hago el container con sus bordes para que quede facherito
+            div.col-md-.container.border.border-1.bg-white.shadow-lg
+                //Un pequeño titulo xd
+                div.mt-1.d-flex.justify-content-center.border-bottom.border-4.bg-secundary
+                    p.h5 Fotos subidas
+                //Aca copie lo del index pero dps lo cambiamos muchachos, hay que hacer la logica para meterle las fotos que haya subido el usuario    
+                div.row.row-cols-1.row-cols-md-3.flex-grow-1.align-items-start.mt-2
+
+                    div.col
+                        div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
+                            img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=1" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
+                            div.card-body.px-2.pt-3
+                                div.d-flex.justify-content-between.align-items-center.mb-2
+                                    h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 1
+                                    div.d-flex.gap-2
+                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                            i.bi.bi-heart-fill ❤️
+                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                            i.bi.bi-heartbreak-fill 💔
+                                p.card-text.text-muted.text-truncate re pro wacho. 
+
+                    div.col
+                        div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
+                            img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=2" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
+                            div.card-body.px-2.pt-3
+                                div.d-flex.justify-content-between.align-items-center.mb-2
+                                    h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 2
+                                    div.d-flex.gap-2
+                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                            i.bi.bi-heart-fill ❤️
+                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                            i.bi.bi-heartbreak-fill 💔
+                                p.card-text.text-muted.text-truncate pipuuuu pipuuu pi puuuu.          
+
+                    div.col
+                        div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
+                            img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=3" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
+                            div.card-body.px-2.pt-3
+                                div.d-flex.justify-content-between.align-items-center.mb-2
+                                    h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 3
+                                    div.d-flex.gap-2
+                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                            i.bi.bi-heart-fill ❤️
+                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                            i.bi.bi-heartbreak-fill 💔
+                                p.card-text.text-muted.text-truncate El que lo lee se la cooo...
+        
+        
+                
+
