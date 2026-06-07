@@ -7,4 +7,6 @@ router.post('/login', authController.procesarLogin);
 //rutas de registro
 router.get('/registro', authController.mostrarRegistro);
 router.post('/registro', authController.procesarRegistro);
+//ruta de logout
+router.get('/logout', authController.logout);
 module.exports = router;

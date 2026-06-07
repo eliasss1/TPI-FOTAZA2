@@ -47,6 +47,10 @@ html(lang="es")
       div.container.mt-1
         a.navbar-brand(href="/") FOTAZA 2
         div.ms-auto.d-flex.gap-2
+          if usuario
+          span.text-light.my-auto Hola, #{usuario.username}
+          a.btn.btn-danger.btn-sm(href="/auth/logout") Cerrar Sesión
+          else
           a.btn.btn-outline-light.btn-sm(href="/auth/login") Iniciar Sesión
           a.btn.btn-primary.btn-sm(href="/auth/registro") Registrarse
     //- Poner las vistas acá

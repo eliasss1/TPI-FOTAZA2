@@ -17,9 +17,14 @@ app.use(express.json())
 app.use(session({
     secret: process.env.SESSION_SECRET || 'clave_secreta',
     resave: false,
-    saveUninitialized: false
-}));;
+    saveUninitialized: true
+}));
+app.use((req, res, next) => {
+    res.locals.usuario = req.session.usuario || null;
+    next();
+});
 app.use(express.static(path.join(__dirname, 'src','public')));
+
 
 // RUTAS
 app.get('/', (req, res) => {

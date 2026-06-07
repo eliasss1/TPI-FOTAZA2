@@ -2,6 +2,14 @@
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/usuario');
 module.exports = {
+
+    logout: (req, res) => {
+        req.session.destroy((err) => {
+            if (err) console.error("Error al cerrar sesión:", err);
+            res.redirect('/');
+        });
+    },
+
     mostrarLogin: (req, res) => {
         res.render('login', { titulo: 'Iniciar Sesion'});
 
@@ -32,7 +40,7 @@ module.exports = {
             email: usuario.email,
             rol: usuario.rol
         };
-
+        console.log("Sesión guardada:", req.session.usuario);//borrar cuando se resuelva el tema de la sesión
         res.redirect('/');
     } catch (error) {
         console.error('Error en login:', error);
