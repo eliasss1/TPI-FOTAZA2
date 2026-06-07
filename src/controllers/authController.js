@@ -6,7 +6,7 @@ module.exports = {
         res.render('login', { titulo: 'Iniciar Sesion'});
 
     },
-    procesarLogin: (req, res) => {
+    procesarLogin: async (req, res) => {
         try {
         const usuario = await Usuario.findOne({ where: { email } });
         if (!usuario) {

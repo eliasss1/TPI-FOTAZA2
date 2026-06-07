@@ -6,14 +6,15 @@ block content
       div.card.shadow
         div.card-body
           h2.text-center.mb-4 Registro de Usuario
-          if error
-          div.alert.alert-danger= error  
-          form(action="/auth/login" method="POST")
           
-          //- El formulario apunta a la ruta POST que tenemos en express
+          
+          if error
+            div.alert.alert-danger.text-center(role="alert")= error
+
+          
           form(action="/auth/registro" method="POST")
             div.mb-3
-              label.form-label(for="username") Nombre
+              label.form-label(for="username") Nombre de usuario
               input#username.form-control(type="text" name="username" required placeholder="Tu nombre")
             
             div.mb-3
