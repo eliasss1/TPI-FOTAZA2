@@ -7,8 +7,9 @@ module.exports = {
 
     },
     procesarLogin: async (req, res) => {
+        const { email, password } = req.body;
         try {
-        const usuario = await Usuario.findOne({ where: { email } });
+        const usuario = await Usuario.findOne({ where: { email: email } });
         if (!usuario) {
             return res.render('login', { titulo: 'Iniciar Sesion', error: 'Email o contraseña incorrectos' });
         }
