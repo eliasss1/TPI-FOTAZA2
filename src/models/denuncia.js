@@ -13,7 +13,7 @@ const Denuncia = sequelize.define('Denuncia', {
     },
     resuelta: {
         type: DataTypes.BOOLEAN,
-        defaultValues: false
+        defaultValue: false
     }
 }, {
     tableName: 'denuncias',

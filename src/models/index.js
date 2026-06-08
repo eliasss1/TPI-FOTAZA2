@@ -42,7 +42,7 @@ Comentario.belongsTo(Publicacion, { foreignKey: 'publicacion_id' });
 
 // etiquetas
 Publicacion.belongsToMany(Etiqueta, { through: 'publicacion_etiquetas', foreignKey: 'publicacion_id'});
-Etiqueta.belongsToMany(Publicacion, { through: 'publicacion_etiquetas', foreignKey: 'etiquetas_id'});
+Etiqueta.belongsToMany(Publicacion, { through: 'publicacion_etiquetas', foreignKey: 'etiqueta_id'});
 
 // denuncias
 Usuario.hasMany(Denuncia, { foreignKey: 'usuario_id', as: 'denuncias_hechas'});
