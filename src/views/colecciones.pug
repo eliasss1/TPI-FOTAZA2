@@ -2,4 +2,71 @@ extends layout
 
 block content
 
-    div.container.d-flex.bg-white.shadow-lg(style="min-height: calc(100vh - 9rem);")
+    div.container.bg-light.shadow-lg.p-4.d-flex.flex-column(style="min-height: calc(100vh - 9rem);")
+        div.row.mb-5.justify-content-center
+            div.col-md-8
+                form.d-flex.gap-2(action="/buscar" method="GET")
+                    input.form-control.form-control-lg.border-2(type="text" name="query" placeholder="Buscar fotos por título o descripción...")
+                    button.btn.btn-primary.btn-lg(type="submit") Buscar
+
+    
+        div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
+
+            div.col
+                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
+                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=1" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
+                    div.card-body.px-2.pt-3
+                        div.d-flex.justify-content-between.align-items-center.mb-2
+                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 1
+                            div.d-flex.gap-2
+                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                    i.bi.bi-heart-fill ❤️
+                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                    i.bi.bi-heartbreak-fill 💔
+                        p.card-text.text-muted.text-truncate re pro wacho. 
+
+            div.col
+                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
+                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=2" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
+                    div.card-body.px-2.pt-3
+                        div.d-flex.justify-content-between.align-items-center.mb-2
+                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 2
+                            div.d-flex.gap-2
+                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                    i.bi.bi-heart-fill ❤️
+                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                    i.bi.bi-heartbreak-fill 💔
+                        p.card-text.text-muted.text-truncate pipuuuu pipuuu pi puuuu.          
+
+            div.col
+                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
+                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=3" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
+                    div.card-body.px-2.pt-3
+                        div.d-flex.justify-content-between.align-items-center.mb-2
+                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 3
+                            div.d-flex.gap-2
+                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                    i.bi.bi-heart-fill ❤️
+                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                    i.bi.bi-heartbreak-fill 💔
+                        p.card-text.text-muted.text-truncate El que lo lee se la cooo...
+            
+    
+        nav.mt-auto.pt-4(aria-label="Paginacion de colecciones")
+            //Solo muestra la webada esa de abajo si hay más de 1 pagina en total
+            if totalPaginas > 1
+                ul.pagination.justify-content-center.mb-0
+                
+                //Boton Anterior: Se desactiva (.disabled) si estás en la pagina 1
+                li(class=`page-item ${paginaActual === 1 ? 'disabled' : ''}`)
+                    a.page-link(href=`/colecciones?page=${paginaActual - 1}`) Anterior
+                
+                //Este bucle te tira la cantidad de numeros de pagina (el backend lo hacemos dps)
+                - var n = 1;
+                while n <= totalPaginas
+                    li(class=`page-item ${paginaActual === n ? 'active' : ''}`)
+                    a.page-link(href=`/colecciones?page=${n}`)= n++
+                
+                //Boton Siguiente: Se desactiva si estas en la ultima pagina
+                li(class=`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`)
+                    a.page-link(href=`/colecciones?page=${paginaActual + 1}`) Siguiente

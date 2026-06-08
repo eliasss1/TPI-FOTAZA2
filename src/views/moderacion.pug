@@ -2,7 +2,7 @@ extends layout
 
 block content
     div.container.bg-light.shadow-lg.p-2(style="min-height: calc(100vh - 9rem);")
-        h1.text-center Moderacion
+        h1.text-muted.text-center Gestion de Denuncias y Moderación
         div.d-flex.aling-items-start.gap-4 
 
             //Esta es la barra lateral que flota
@@ -17,28 +17,49 @@ block content
                         a.nav-link.link-dark(href="#") Usuarios Inactivos
 
             div.d-flex.flex-column.p-1.bg-white.shadow-lg(style="width: 1100px; height: 700px")
+                if listaDenuncias && listaDenuncias.length > 0
+                    //Aca empieza lo que seria la denuncia, un bucle que le falta la logica aun
+                    each denuncia in listaDenuncias
+                        div.d-flex.border-bottom.border-1.bg-light.shadow-lg(style="height: 60px; overflow: hidden; white-space: nowrap")
+                            div.border-end.border-2.px-2
+                                h5.card-title.fw-bold= denuncia.titulo
+                                p.card-text.text-muted Subido por: @#{denuncia.autor.username}
+                            div.px-2
+                                p.text-danger.fw-semibold.mb-2 Motivo: "#{denuncia.motivo}"
+                                p.small.text-secondary Justificación: "#{denuncia.justificacion}"
+                            div.d-flex.px-5.py-2.gap-2 
+                                button.btn.btn-danger.text-white(style="height: 40px;" data=denuncia.id) Rechazar
+                                button.btn.btn-success.text-white(style="height: 40px;" data-id=denuncia.id) Aceptar
+                else 
+                    div.d-flex.border-bottom.border-1.bg-light.shadow-lg(style="height: 60px; overflow: hidden; white-space: nowrap")
+                        div.border-end.border-2.px-2
+                            h5.card-title.fw-bold Foto Ejemplo Denunciada
+                            p.card-text.text-muted Subido por: @usuario_facha
+                        div.px-2
+                            p.text-danger.fw-semibold.mb-2 Motivo: "Contenido inapropiado / Copyright"
+                            p.small.text-secondary Justificación: "El usuario se robó esta foto de mi feed de Instagram sin permiso."
+                        div.d-flex.px-5.py-2.gap-2 
+                            button.btn.btn-danger.text-white(style="height: 40px;") Rechazar
+                            button.btn.btn-success.text-white(style="height: 40px;") Aceptar
 
-                //Aca empieza lo que seria la denuncia, ahora lo pego asi pero dps se podra mdoificar, esta de ejemplo
-                div.d-flex.border-bottom.border-1.bg-light(style="height: 60px; overflow: hidden; white-space: nowrap")
-                    div.border-end.border-2.px-2
-                        h5.card-title.fw-bold Foto Ejemplo Denunciada
-                        p.card-text.text-muted Subido por: @usuario_facha
-                    div.px-2
-                        p.text-danger.fw-semibold.mb-2 Motivo: "Contenido inapropiado / Copyright"
-                        p.small.text-secondary Justificación: "El usuario se robó esta foto de mi feed de Instagram sin permiso."
-                    div.d-flex.px-5.py-2.gap-2 
-                        button.btn.btn-primary(style="height: 40px;") Rechazar
-                        button.btn.btn-primary(style="height: 40px;") Aceptar
-
-                div.d-flex.border-bottom.border-1.bg-light(style="height: 60px; overflow: hidden; white-space: nowrap")
-                    div.border-end.border-2.px-2
-                        h5.card-title.fw-bold Foto Ejemplo Denunciada
-                        p.card-text.text-muted Subido por: @usuario_facha
-                    div.px-2
-                        p.text-danger.fw-semibold.mb-2 Motivo: "Contenido inapropiado / Copyright"
-                        p.small.text-secondary Justificación: "El usuario se robó esta foto de mi feed de Instagram sin permiso."
-                    div.d-flex.px-5.py-2.gap-2 
-                        button.btn.btn-primary(style="height: 40px;") Rechazar
-                        button.btn.btn-primary(style="height: 40px;") Aceptar
+                //Aca esta la barrita esa de navegacion para hacerle la logica
+                nav.mt-auto.pt-4(aria-label="Paginacion de denuncias")
+                //Solo muestra la webada esa de abajo si hay más de 1 pagina en total
+                if totalPaginas > 1
+                    ul.pagination.justify-content-center.mb-0
+                    
+                    //Boton Anterior: Se desactiva (.disabled) si estás en la pagina 1
+                    li(class=`page-item ${paginaActual === 1 ? 'disabled' : ''}`)
+                        a.page-link(href=`/moderacion?page=${paginaActual - 1}`) Anterior
+                    
+                    //Este bucle te tira la cantidad de numeros de pagina (el backend lo hacemos dps)
+                    - var n = 1;
+                    while n <= totalPaginas
+                        li(class=`page-item ${paginaActual === n ? 'active' : ''}`)
+                        a.page-link(href=`/moderacion?page=${n}`)= n++
+                    
+                    //Boton Siguiente: Se desactiva si estas en la ultima pagina
+                    li(class=`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`)
+                        a.page-link(href=`/moderacion?page=${paginaActual + 1}`) Siguiente
 
 
