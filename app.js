@@ -39,6 +39,9 @@ app.use('/auth', authRoutes);
 // Iniciar el servidor
 
 app.get('/perfil', (req, res) => {
+    if (!req.session.usuario) {
+        return res.redirect('/auth/login');
+    }
     res.render('perfil');
 });
 
