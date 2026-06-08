@@ -8,10 +8,10 @@ block content
                 img.mx-auto.my-auto(style="height: 140px; width: 140px" src="/images/usuario.png")
             div.col-md-5.ms-4.d-flex.border-start.border-4
                 .row.d-flex.w-100(style="max-width: 100%;")
-                    h1.col-md-5 Username
+                    h1.col-md-5 #{usuario ? usuario.username : 'Invitado'}
                     h5.col-md-3.ms-1.mt-1 seguidores
                     h5.col-md-3.ms-1.mt-1 seguidos
-                    h5 Nombre real completo
+                    h5 #{usuario ? usuario.email : ''}
                     p.card-text.text-muted.text-truncate Biografia corta laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
                     div.dropdown.d-inline-block   
                         button#btnDrop1.btn.btn-primary.mt-1.dropdown-toggle(type="button" data-bs-toggle="dropdown" style="width: 100px") Editar
@@ -19,10 +19,10 @@ block content
                             form
                                 .mb-3
                                     label.form-label(for="username") Username
-                                    input.form-control(type="text" placeholder="Pepito123")
+                                    input.form-control(type="text" name="username" value=`${usuario ? usuario.username : ''}`)
                                 .mb-3
                                     label.form-label(for="nombre") Nombre real completo
-                                    input.form-control(type="text" placeholder="Pepito Lujan")
+                                    input.form-control(type="text" name="email" value=`${usuario ? usuario.email : ''}`)
                                 .mb-3
                                     label.form-label(for="biografia") Biografia Corta
                                     input.form-control(type="text" rows="2" placeholder="Ayer me comi un sapito")
