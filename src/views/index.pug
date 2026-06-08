@@ -1,58 +1,111 @@
 extends layout
 
 block content
-    
-    div.container.bg-light.shadow-lg.p-4.d-flex.flex-column(style="min-height: calc(100vh - 9rem);")
+    //- Contenedor Blanco Óptico Elástico
+    div.container.bg-white.rounded-4.shadow-lg.p-4.my-4.d-flex.flex-column(style="min-height: calc(100vh - 12rem);")
         
-        div.row.mb-5.justify-content-center
+        
+        div.row.mb-4.justify-content-center
             div.col-md-8
                 form.d-flex.gap-2(action="/buscar" method="GET")
-                    input.form-control.form-control-lg.border-2(type="text" name="query" placeholder="Buscar fotos por título o descripción...")
-                    button.btn.btn-primary.btn-lg(type="submit") Buscar
+                    input.form-control.border-2(type="text" name="query" placeholder="Buscar fotos, autores o etiquetas...")
+                    button.btn.btn-primary(type="submit") Buscar
 
-    
+        
         div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
+        
+            if publicaciones && publicaciones.length > 0
+                each publicacion in publicaciones
+                    div.col
+                        
+                        div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
+                        
+                            
+                            if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'con_copyright'
+                                div.position-absolute.top-50.start-50.translate-middle.w-100.text-center.pe-none(style="z-index: 10; opacity: 0.4; transform: translate(-50%, -50%) rotate(-30deg) !important;")
+                                    p.text-dark.fw-bold.fs-4.m-0.text-uppercase= publicacion.imagenes[0].marca_agua || "© FOTAZA 2 PROTEGIDA"
 
-            div.col
-                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=1" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                    div.card-body.px-2.pt-3
-                        div.d-flex.justify-content-between.align-items-center.mb-2
-                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 1
-                            div.d-flex.gap-2
-                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                    i.bi.bi-heart-fill ❤️
-                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                    i.bi.bi-heartbreak-fill 💔
-                        p.card-text.text-muted.text-truncate re pro wacho. 
+                            
+                            div.position-relative.overflow-hidden.rounded-3
+                                if publicacion.imagenes && publicacion.imagenes[0]
+                                    img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 240px; w-100;")
+                                else
+                                    img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 240px; w-100;")
 
-            div.col
-                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=2" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                    div.card-body.px-2.pt-3
-                        div.d-flex.justify-content-between.align-items-center.mb-2
-                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 2
-                            div.d-flex.gap-2
-                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                    i.bi.bi-heart-fill ❤️
-                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                    i.bi.bi-heartbreak-fill 💔
-                        p.card-text.text-muted.text-truncate pipuuuu pipuuu pi puuuu.          
+                            
+                            div.card-body.px-2.pt-3
+                                
+                                div.d-flex.justify-content-between.align-items-center.mb-1
+                                    h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
+                                    div.d-flex.gap-2
+                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
+                                            i.bi.bi-heart-fill.fs-5
+                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
+                                            i.bi.bi-heartbreak-fill.fs-5
 
-            div.col
-                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=3" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                    div.card-body.px-2.pt-3
-                        div.d-flex.justify-content-between.align-items-center.mb-2
-                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 3
-                            div.d-flex.gap-2
-                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                    i.bi.bi-heart-fill ❤️
-                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                    i.bi.bi-heartbreak-fill 💔
-                        p.card-text.text-muted.text-truncate El que lo lee se la cooo...
-            
-    
+                                
+                                div.d-flex.align-items-center.gap-1.mb-2
+                                    span.text-warning.small
+                                        i.bi.bi-star-fill.me-1
+                                        span.fw-bold.text-dark= publicacion.promedioValoracion || "0.0"
+                                    span.text-muted.small= `(${publicacion.cantidadVotos || 0} valoraciones)`
+
+                                
+                                p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion || "Sin descripción disponible."
+
+                                
+                                div.d-flex.justify-content-between.align-items-center.border-top.pt-2.mt-2
+                                    button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="button")
+                                        i.bi.bi-bag-check-fill
+                                        | Me interesa
+                            
+                                    button.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
+                                        i.bi.bi-chat-left-text-fill
+                                        if publicacion.comentarios_abiertos === false
+                                            span.badge.bg-danger.ms-1.small Cerrado
+                                        else
+                                            span.badge.bg-dark.ms-1= publicacion.comentarios ? publicacion.comentarios.length : 0
+
+                                    button.btn.btn-outline-danger.btn-sm(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
+                                        i.bi.bi-exclamation-triangle-fill
+
+                    
+                    div.modal.fade(id=`modalDenuncia-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                        div.modal-dialog.modal-dialog-centered
+                            div.modal-content.border-0.shadow-lg
+                                div.modal-header.bg-danger.text-white
+                                    h5.modal-title.fw-bold
+                                        i.bi.bi-shield-fill-exclamation.me-2
+                                        | Denunciar Publicación
+                                    button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+                                
+                                div.modal-body.p-4
+                                    p.text-muted.small Explicá el motivo por el cual esta imagen rompe las normas de comportamiento de la comunidad.
+                                    form(action=`/denunciar/${publicacion.id}` method="POST")
+                                        div.mb-3
+                                            label.form-label.fw-bold.text-secondary Motivo de la Denuncia
+                                            select.form-select(name="motivo" required)
+                                                option(value="" disabled selected) Seleccioná una opción...
+                                                option(value="copyright") Infracción de Copyright / Plagio
+                                                option(value="inapropiado") Contenido Inapropiado / Ofensivo
+                                                option(value="spam") Spam o Contenido Engañoso
+                                                option(value="otros") Otros motivos
+                                        
+                                        div.mb-3
+                                            label.form-label.fw-bold.text-secondary Descripción / Justificación Corta
+                                            textarea.form-control(name="justificacion" rows="3" required placeholder="Detallá de forma breve tu denuncia...")
+                                        
+                                        div.d-flex.justify-content-end.gap-2.mt-4
+                                            button.btn.btn-light(type="button" data-bs-dismiss="modal") Cancelar
+                                            button.btn.btn-danger(type="submit") Enviar Denuncia
+            else
+                
+                div.col-12.text-center.py-5.my-auto
+                    i.bi.bi-image-fill.text-secondary.opacity-25(style="font-size: 5rem;")
+                    h4.fw-bold.text-secondary.mt-3 No hay publicaciones disponibles
+                    p.text-muted Las fotos que suba la comunidad aparecerán automáticamente en este feed.
+
+        
         nav.mt-auto.pt-4(aria-label="Paginación de fotos")
             ul.pagination.justify-content-center.mb-0
                 li.page-item.disabled
@@ -65,4 +118,3 @@ block content
                     a.page-link(href="#") 3
                 li.page-item
                     a.page-link(href="#") Siguiente
-                
