@@ -1,7 +1,7 @@
 extends layout
 
 block content
-    div.container.bg-white.shadow-lg.p-5.my-4.rounded(style="min-height: calc(100vh - 12rem);")
+    div.container.bg-white.shadow-lg.p-5.rounded(style="min-height: calc(100vh - 5rem);")
         h1.text-center.mb-4 Crea tu publicación
         
         form.flex-column.d-flex(action="/publicaciones/crear" method="POST" enctype="multipart/form-data")

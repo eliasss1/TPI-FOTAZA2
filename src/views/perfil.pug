@@ -2,7 +2,7 @@ extends layout
 
 block content
     
-    div.container.bg-white.rounded-4.shadow-lg.p-5.my-4.d-flex.flex-column(style="min-height: calc(100vh - 12rem);")
+    div.container.bg-white.rounded-1.shadow-lg.p-5.d-flex.flex-column(style="height: calc(100vh - 5rem);")
         
         //Cabecera del Perfil
         div.row.mb-5.align-items-center.border-bottom.pb-4
@@ -51,7 +51,7 @@ block content
                         | Contenido de usuarios que sigo
 
         //Contenedor de las Secciones
-        div.tab-content.flex-grow-1.d-flex.flex-column(id="perfilTabsContent")
+        div.tab-content.flex-grow-1.d-flex.flex-column.overflow-auto(id="perfilTabsContent")
             
             //PESTAÑA A: PUBLICACIONES PROPIAS
             div.tab-pane.fade.show.active.flex-grow-1.d-flex.flex-column(id="mis-fotos" role="tabpanel" aria-labelledby="mis-fotos-tab")
@@ -59,18 +59,19 @@ block content
                     if publicaciones && publicaciones.length > 0
                         each publicacion in publicaciones
                             div.col
+                                //El contenedor de la imagen especifica
                                 div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
-                                    
+                                    //Si tiene marca de agua se la pongo IIIIJAAA
                                     if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'con_copyright'
                                         div.position-absolute.top-50.start-50.translate-middle.w-100.text-center.pe-none(style="z-index: 10; opacity: 0.4; transform: translate(-50%, -50%) rotate(-30deg) !important;")
                                             p.text-dark.fw-bold.fs-4.m-0.text-uppercase= publicacion.imagenes[0].marca_agua
-
+                                    //Cargo la imagen y si no hay, pongo una random
                                     div.position-relative.overflow-hidden.rounded-3
                                         if publicacion.imagenes && publicacion.imagenes[0]
                                             img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 220px; w-100;")
                                         else
                                             img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 220px; w-100;")
-
+                                    //El cuerpo donde va la informacion de la imagen
                                     div.card-body.px-2.pt-3
                                         div.d-flex.justify-content-between.align-items-center.mb-1
                                             h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
@@ -79,23 +80,60 @@ block content
                                                     i.bi.bi-heart-fill.fs-5
                                                 button.btn.btn-link.p-0.text-muted
                                                     i.bi.bi-heartbreak-fill.fs-5
-
+                                        //Valoracion
                                         div.d-flex.align-items-center.gap-1.mb-2
                                             span.text-warning.small
                                                 i.bi.bi-star-fill.me-1
                                                 span.fw-bold.text-dark= publicacion.promedioValoracion
                                             span.text-muted.small= `(${publicacion.cantidadVotos} votos)`
-
+                                        //La descripcion
                                         p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
-
+                                        //Los botones interactivos
                                         div.d-flex.justify-content-between.align-items-center.border-top.pt-2.mt-2
                                             button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="button")
                                                 i.bi.bi-bag-check-fill
                                                 | Detalles
                                             
-                                            button.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
-                                                i.bi.bi-chat-left-text-fill
-                                                span.badge.bg-dark.ms-1= publicacion.comentarios ? publicacion.comentarios.length : 0
+                                            if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
+                                                span.badge.bg-danger.ms-1.small ---
+                                            else
+                                                button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
+                                                    img(src="/images/comentario.png" style="height: 20px; width: 20px")
+
+                                //VENTANA MODAL DE COMENTARIOS (esta un toque incompleta porque nose hacerle bien la logica al modal, pero supongo que esta listo)
+                                div.modal.fade(id=`modalComentario-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                    div.modal-dialog.modal-dialog-centered 
+                                        div.modal-content.border-0.shadow-lg
+                                            //Este es la cabeza de la ventanita modal
+                                            div.modal-header.bg-transparent.text-secondary 
+                                                h5.modal-title.fw-bold
+                                                    i.bi.bi-shield-fill-exclamation.me-2
+                                                    | Comentarios
+                                                button.btn-close.btn-close-secondary(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+
+                                            //este es el cuerpo del modal
+                                            div.modal-body.p-4
+
+                                                //¡¡¡¡IMPORTANTE MUCHACHOS!!!! ACA VA EL CONTENIDO CON LOS COMENTARIOS ADENTRO
+                                                div.d-flex.flex-column.p-2.overflow-auto(style="min-height: 150px; max-height: 500px")
+                                                    if publicacion.comentarios && publicacion.comentarios.length > 0
+
+                                                        each comentario in publicacion.comentarios
+                                                            div.gap-2.border-bottom.border-1.p-2
+                                                                .row
+                                                                    strong.col-md-2 #{comentario.autor.username}
+                                                                    p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
+                                                                
+                                                                    button.col-md-1.ms-5.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
+                                                                        img.pb-1(src="/images/me-gusta.png" style="height: 15px; width: 15px")
+
+                                                //ACA ES DONDE LE DEJA COMENTAR AL USUARIO
+                                                div.border-top.border-1.p-1
+                                                    form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
+                                                        .mb-3(style="width:400px") 
+                                                            textarea#texto.form-control(type="text" name="comentario" placeholder="Comenta lo que desees..." required)
+                                                        button.btn.btn-primary.mb-3(type="submit" style="height: 60px") Comentar
+
                     else
                         div.col-12.text-center.py-5.my-auto
                             i.bi.bi-camera.text-secondary.opacity-25(style="font-size: 4rem;")

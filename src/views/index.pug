@@ -2,7 +2,7 @@ extends layout
 
 block content
     
-    div.container.bg-white.rounded-4.shadow-lg.p-4.my-4.d-flex.flex-column(style="min-height: calc(100vh - 12rem);")
+    div.container.bg-white.rounded-1.shadow-lg.p-4.d-flex.flex-column(style="height: calc(100vh - 5rem);")
         
         //Barra de busqueda
         div.row.mb-4.justify-content-center
@@ -17,6 +17,7 @@ block content
             if publicaciones && publicaciones.length > 0
                 each publicacion in publicaciones
                     div.col
+                        //El contenedor de la foto especifica
                         div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
                             
                             //Capa para Marca de Agua
@@ -70,15 +71,15 @@ block content
                                         | Me interesa
                                     
                                     if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
-                                        span.badge.bg-danger.ms-1.small ----
+                                        span.badge.bg-danger.ms-1.small ---
                                     else
-                                        button.btn.btn-outline-secondary.btn-sm.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
+                                        button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
                                             img(src="/images/comentario.png" style="height: 20px; width: 20px")
 
-                                    button.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
-                                        img.pb-1(src="/images/estrella.png" style="height: 20px; width: 20px")        
+                                    button.btn.btn-outline-secondary.btn-sm.mt-1.border-0.position-relative(type="button")
+                                        img.pb-1(src="/images/estrella.png" style="height: 25px; width: 20px")        
 
-                                    button.btn.btn-outline-danger.btn-sm(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
+                                    button.btn.btn-outline-danger.btn-sm.border-0(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
                                         img(src="/images/bandera.png" style="height: 20px; width: 20px")
 
                         //VENTANA MODAL DE COMENTARIOS (esta un toque incompleta porque nose hacerle bien la logica al modal, pero supongo que esta listo)
