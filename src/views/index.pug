@@ -53,7 +53,7 @@ block content
                                         button.btn.btn-link.p-0.text-muted(title="No me gusta")
                                             i.bi.bi-heartbreak-fill.fs-5
 
-                                //Sistema de Valoracion
+                                //Valoracion
                                 div.d-flex.align-items-center.gap-1.mb-2
                                     span.text-warning.small
                                         i.bi.bi-star-fill.me-1
@@ -68,16 +68,52 @@ block content
                                     button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="button")
                                         i.bi.bi-bag-check-fill
                                         | Me interesa
-                            
+                                    
+                                    if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
+                                        span.badge.bg-danger.ms-1.small ----
+                                    else
+                                        button.btn.btn-outline-secondary.btn-sm.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
+                                            img(src="/images/comentario.png" style="height: 20px; width: 20px")
+
                                     button.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
-                                        i.bi.bi-chat-left-text-fill
-                                        if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
-                                            span.badge.bg-danger.ms-1.small Cerrado
-                                        else
-                                            span.badge.bg-dark.ms-1= publicacion.comentarios ? publicacion.comentarios.length : 0
+                                        img.pb-1(src="/images/estrella.png" style="height: 20px; width: 20px")        
 
                                     button.btn.btn-outline-danger.btn-sm(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
-                                        i.bi.bi-exclamation-triangle-fill
+                                        img(src="/images/bandera.png" style="height: 20px; width: 20px")
+
+                        //VENTANA MODAL DE COMENTARIOS (esta un toque incompleta porque nose hacerle bien la logica al modal, pero supongo que esta listo)
+                        div.modal.fade(id=`modalComentario-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                            div.modal-dialog.modal-dialog-centered 
+                                div.modal-content.border-0.shadow-lg
+                                    //Este es la cabeza de la ventanita modal
+                                    div.modal-header.bg-transparent.text-secondary 
+                                        h5.modal-title.fw-bold
+                                            i.bi.bi-shield-fill-exclamation.me-2
+                                            | Comentarios
+                                        button.btn-close.btn-close-secondary(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+
+                                    //este es el cuerpo del modal
+                                    div.modal-body.p-4
+
+                                        //¡¡¡¡IMPORTANTE MUCHACHOS!!!! ACA VA EL CONTENIDO CON LOS COMENTARIOS ADENTRO
+                                        div.d-flex.flex-column.p-2.overflow-auto(style="min-height: 150px; max-height: 500px")
+                                            if publicacion.comentarios && publicacion.comentarios.length > 0
+
+                                                each comentario in publicacion.comentarios
+                                                    div.gap-2.border-bottom.border-1.p-2
+                                                        .row
+                                                            strong.col-md-2 #{comentario.autor.username}
+                                                            p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
+                                                        
+                                                            button.col-md-1.ms-5.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
+                                                                img.pb-1(src="/images/me-gusta.png" style="height: 15px; width: 15px")
+
+                                        //ACA ES DONDE LE DEJA COMENTAR AL USUARIO
+                                        div.border-top.border-1.p-1
+                                            form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
+                                                .mb-3(style="width:400px") 
+                                                    textarea#texto.form-control(type="text" name="comentario" placeholder="Comenta lo que desees..." required)
+                                                button.btn.btn-primary.mb-3(type="submit" style="height: 60px") Comentar     
 
                         //VENTANITA MODAL DE DENUNCIA
                         div.modal.fade(id=`modalDenuncia-${publicacion.id}` tabindex="-1" aria-hidden="true")

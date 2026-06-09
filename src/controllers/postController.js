@@ -1,4 +1,4 @@
-const { Publicacion, Imagen, Usuario} = require('../models');
+const { Publicacion, Imagen, Usuario, Comentario} = require('../models');
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
@@ -9,10 +9,14 @@ module.exports = {
             const publicaciones = await Publicacion.findAll({
                 include: [
                     { model: Usuario, as: 'autor', attributes: ['username']},
-                    { model: Imagen, as: 'imagenes'}
+                    { model: Imagen, as: 'imagenes'},
+                    { model: Comentario, as: 'comentarios',
+                        include: [{ model: Usuario, as: 'autor'}]
+                    }
                 ],
                 order: [['createdAt', 'DESC']]
             });
+            
             res.render('index', { titulo: 'Feed Fotaza', publicaciones});
         } catch (error) {
             console.error('Error al cargar el feed:', error);
@@ -82,7 +86,12 @@ module.exports = {
             
             const publicaciones = await Publicacion.findAll({
                 where: { usuario_id: usuarioId },
-                include: [{ model: Imagen, as: 'imagenes' }],
+                include: [
+                    { model: Imagen, as: 'imagenes' },
+                    { model: Comentario, as: 'comentarios',
+                        include: [{ model: Usuario, as: 'autor'}]
+                    }
+                ],
                 order: [['createdAt', 'DESC']]
             });
 
@@ -110,7 +119,29 @@ module.exports = {
             console.error('Error al cargar los datos del perfil:', error);
             res.status(500).send('Error interno del servidor');
         }
-    }
+    },
+
+    crearComentario: async (req, res) => {
+        try{
+            const idPublicacion = req.params.id; 
+            const idUsuario = req.session.usuario.id;
+            const textoContenido = req.body.comentario;
+
+            await Comentario.create({
+                texto: textoContenido,
+                usuario_id: idUsuario,
+                publicacion_id: idPublicacion
+            });
+            
+            res.redirect(req.get('Referrer') || '/');
+
+        }catch(error){
+            console.error("No se ha podido publicar el comentario", error);
+            res.status(500).send("Ha habido un error al cargar tu comentario");
+        }
+    },
+
+    
 
 };
 

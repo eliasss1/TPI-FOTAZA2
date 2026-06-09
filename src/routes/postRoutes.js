@@ -8,5 +8,6 @@ router.get('/nueva-publicacion', estaAutenticado, postController.mostrarFormular
 router.post('/publicaciones/crear', estaAutenticado, postController.crearPublicacion);
 
 router.get('/perfil', estaAutenticado, postController.mostrarPerfil);
+router.post('/comentar/:id', estaAutenticado, postController.crearComentario);
 
 module.exports = router;

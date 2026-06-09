@@ -37,7 +37,7 @@ Usuario.belongsToMany(Usuario, {
 Usuario.hasMany(Comentario, { foreignKey: 'usuario_id'});
 Comentario.belongsTo( Usuario, { foreignKey: 'usuario_id', as: 'autor'});
 
-Publicacion.hasMany(Comentario, { foreignKey: 'publicacion_id', onDelete: 'CASCADE' });
+Publicacion.hasMany(Comentario, { foreignKey: 'publicacion_id', as: 'comentarios', onDelete: 'CASCADE' });
 Comentario.belongsTo(Publicacion, { foreignKey: 'publicacion_id' });
 
 // etiquetas
