@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/postController');
-const estaAutenticado = require('../middlewares/authMiddleware');
+const {estaAutenticado, esModerador} = require('../middlewares/authMiddleware');
 
 router.get('/', postController.mostrarFeed);
 router.get('/perfil/:id', estaAutenticado, postController.mostrarPerfil);
@@ -11,4 +11,7 @@ router.post('/publicaciones/crear', estaAutenticado, postController.crearPublica
 router.get('/perfil', estaAutenticado, postController.mostrarPerfil);
 router.post('/comentar/:id', estaAutenticado, postController.crearComentario);
 
+router.get('/moderacion', estaAutenticado, esModerador, (req, res) => {
+    res.render('moderacion');
+});
 module.exports = router;

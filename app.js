@@ -38,11 +38,11 @@ app.use('/auth', authRoutes);
 
 // MIDDLEWARES RUTAS SUELTAS
 
-const estaAutenticado = require('./src/middlewares/authMiddleware');
+const {estaAutenticado, esModerador} = require('./src/middlewares/authMiddleware');
 
 // Iniciar el servidor
 
-app.get('/moderacion', estaAutenticado, (req, res) => {
+app.get('/moderacion', estaAutenticado, esModerador, (req, res) => {
     res.render('moderacion');
 });
 
