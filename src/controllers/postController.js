@@ -6,10 +6,18 @@ const path = require('path');
 module.exports = {
     mostrarFeed: async (req, res) => {
         try {
+            const estaLogueado = req.session.usuario ? true : false;
+            
+            const condicionImagen = estaLogueado ? {} : { tipo_licencia: 'sin_copyright'};
+
             const publicaciones = await Publicacion.findAll({
                 include: [
-                    { model: Usuario, as: 'autor', attributes: ['username']},
-                    { model: Imagen, as: 'imagenes'}
+                    {   model: Usuario, as: 'autor', attributes: ['username']},
+                    {   model: Imagen, 
+                        as: 'imagenes',
+                        where: condicionImagen,
+                        required: true
+                    }
                 ],
                 order: [['createdAt', 'DESC']]
             });
@@ -18,7 +26,6 @@ module.exports = {
             console.error('Error al cargar el feed:', error);
             res.status(500).send('Error interno');
         } 
-        
     },
 
     mostrarFormulario: (req, res) => {

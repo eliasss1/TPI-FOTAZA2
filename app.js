@@ -36,24 +36,25 @@ app.use('/', postRoutes);
 // Rutas de autenticación
 app.use('/auth', authRoutes);
 
+// MIDDLEWARES RUTAS SUELTAS
+
+const estaAutenticado = require('./src/middlewares/authMiddleware');
+
 // Iniciar el servidor
 
-app.get('/perfil', (req, res) => {
-    if (!req.session.usuario) {
-        return res.redirect('/auth/login');
-    }
+app.get('/perfil', estaAutenticado, (req, res) => {
     res.render('perfil');
 });
 
-app.get('/moderacion', (req, res) => {
+app.get('/moderacion', estaAutenticado, (req, res) => {
     res.render('moderacion');
 });
 
-app.get('/notificaciones', (req, res) => {
+app.get('/notificaciones', estaAutenticado, (req, res) => {
     res.render('notificaciones');
 });
 
-app.get('/colecciones', (req, res) => {
+app.get('/colecciones', estaAutenticado, (req, res) => {
     res.render('colecciones');
 });
 
