@@ -1,82 +1,140 @@
 extends layout
 
 block content
-    div.container.d-flex.flex-column.bg-light.shadow-lg.p-2(style="min-height: calc(100vh - 9rem)")
+    
+    div.container.bg-white.rounded-4.shadow-lg.p-5.my-4.d-flex.flex-column(style="min-height: calc(100vh - 12rem);")
+        
+        //Cabecera del Perfil
+        div.row.mb-5.align-items-center.border-bottom.pb-4
+            div.col-md-8
+                div.d-flex.align-items-center.gap-3
+                    //- Toma la inicial del nombre real de la base de datos
+                    div.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold(style="width: 70px; height: 70px; font-size: 2rem;")
+                        = usuario.username.charAt(0).toUpperCase()
+                    <div>
+                        h2.fw-bold.mb-1.text-dark= usuario.username
+                        p.text-muted.small.mb-0= usuario.email
+                    </div>
+            
+            //Seguidores
+            div.col-md-4.text-md-end.mt-3.mt-md-0
+                div.d-flex.justify-content-md-end.gap-4.mb-3
+                    div.text-center
+                        h4.fw-bold.mb-0.text-primary= cantidadSeguidores
+                        small.text-muted seguidores
+                    div.text-center
+                        h4.fw-bold.mb-0.text-primary= cantidadSeguidos
+                        small.text-muted seguidos
+                
+                //Solucionar esto (muestra el boton seguir aunque sea tu propio perfil)
+                if esPropioPerfil
+                    a.btn.btn-outline-secondary.btn-sm.w-100(href="/nueva-publicacion") 
+                        i.bi.bi-plus-circle-fill.me-1
+                        | Nueva Publicación
+                else
+                    form(action=`/usuario/seguir/${usuario.id}` method="POST")
+                        if yaLoSigue
+                            button.btn.btn-secondary.btn-sm.w-100(type="submit") Dejar de seguir
+                        else
+                            button.btn.btn-primary.btn-sm.w-100(type="submit") Seguir
 
-        .row.mx-2.my-3
-            div.col-md-3.card.p-1(style="width: 170px; height: 170px")
-                img.mx-auto.my-auto(style="height: 140px; width: 140px" src="/images/usuario.png")
-            div.col-md-5.ms-4.d-flex.border-start.border-4
-                .row.d-flex.w-100(style="max-width: 100%;")
-                    h1.col-md-5 #{usuario ? usuario.username : 'Invitado'}
-                    h5.col-md-3.ms-1.mt-1 seguidores
-                    h5.col-md-3.ms-1.mt-1 seguidos
-                    h5 #{usuario ? usuario.email : ''}
-                    p.card-text.text-muted.text-truncate Biografia corta laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                    div.dropdown.d-inline-block   
-                        button#btnDrop1.btn.btn-primary.mt-1.dropdown-toggle(type="button" data-bs-toggle="dropdown" style="width: 100px") Editar
-                        .dropdown-menu.p-3.shadow-lg(aria-labelledby="btnDrop1" style="width: 300px; position: absolute;")
-                            form
-                                .mb-3
-                                    label.form-label(for="username") Username
-                                    input.form-control(type="text" name="username" value=`${usuario ? usuario.username : ''}`)
-                                .mb-3
-                                    label.form-label(for="nombre") Nombre real completo
-                                    input.form-control(type="text" name="email" value=`${usuario ? usuario.email : ''}`)
-                                .mb-3
-                                    label.form-label(for="biografia") Biografia Corta
-                                    input.form-control(type="text" rows="2" placeholder="Ayer me comi un sapito")
-                                .justify-content-end
-                                    button.btn.btn-primary.btn-success(type="submit") Guardar cambios
+        //Sistema de Pestañas
+        ul.nav.nav-tabs.mb-4(id="perfilTabs" role="tablist")
+            li.nav-item(role="presentation")
+                button.nav-link.active.fw-bold(id="mis-fotos-tab" data-bs-toggle="tab" data-bs-target="#mis-fotos" type="button" role="tab" aria-controls="mis-fotos" aria-selected="true")
+                    i.bi.bi-grid-3x3-gap-fill.me-2
+                    | Publicaciones Propias
+            if esPropioPerfil
+                li.nav-item(role="presentation")
+                    button.nav-link.fw-bold(id="seguidos-tab" data-bs-toggle="tab" data-bs-target="#seguidos" type="button" role="tab" aria-controls="seguidos" aria-selected="false")
+                        i.bi.bi-people-fill.me-2
+                        | Contenido de usuarios que sigo
+
+        //Contenedor de las Secciones
+        div.tab-content.flex-grow-1.d-flex.flex-column(id="perfilTabsContent")
+            
+            //PESTAÑA A: PUBLICACIONES PROPIAS
+            div.tab-pane.fade.show.active.flex-grow-1.d-flex.flex-column(id="mis-fotos" role="tabpanel" aria-labelledby="mis-fotos-tab")
+                div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
+                    if publicaciones && publicaciones.length > 0
+                        each publicacion in publicaciones
+                            div.col
+                                div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
                                     
-        //Fua loco quiero ordenar un toque la cabeza es una banda, esto que esta aca abajo es para mostrar las fotos subidas, es otra fila con flex-grow-1 para q se extienda todo lo que 
-        //le permite el container o eso jaja
-        .row.flex-grow-1.mx-2.my-3
-            //Aca hago el container con sus bordes para que quede facherito
-            div.col-md-.container.border.border-1.bg-white.shadow-lg
-                //Un pequeño titulo xd
-                div.mt-1.d-flex.justify-content-center.border-bottom.border-4.bg-secundary
-                    p.h5 Fotos subidas
-                //Aca copie lo del index pero dps lo cambiamos muchachos, hay que hacer la logica para meterle las fotos que haya subido el usuario    
-                div.row.row-cols-1.row-cols-md-3.flex-grow-1.align-items-start.mt-2
+                                    if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'con_copyright'
+                                        div.position-absolute.top-50.start-50.translate-middle.w-100.text-center.pe-none(style="z-index: 10; opacity: 0.4; transform: translate(-50%, -50%) rotate(-30deg) !important;")
+                                            p.text-dark.fw-bold.fs-4.m-0.text-uppercase= publicacion.imagenes[0].marca_agua
 
-                    div.col
-                        div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                            img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=1" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                            div.card-body.px-2.pt-3
-                                div.d-flex.justify-content-between.align-items-center.mb-2
-                                    h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 1
-                                    div.d-flex.gap-2
-                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                            i.bi.bi-heart-fill ❤️
-                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                            i.bi.bi-heartbreak-fill 💔
-                                p.card-text.text-muted.text-truncate re pro wacho. 
+                                    div.position-relative.overflow-hidden.rounded-3
+                                        if publicacion.imagenes && publicacion.imagenes[0]
+                                            img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 220px; w-100;")
+                                        else
+                                            img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 220px; w-100;")
 
-                    div.col
-                        div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                            img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=2" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                            div.card-body.px-2.pt-3
-                                div.d-flex.justify-content-between.align-items-center.mb-2
-                                    h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 2
-                                    div.d-flex.gap-2
-                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                            i.bi.bi-heart-fill ❤️
-                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                            i.bi.bi-heartbreak-fill 💔
-                                p.card-text.text-muted.text-truncate pipuuuu pipuuu pi puuuu.          
+                                    div.card-body.px-2.pt-3
+                                        div.d-flex.justify-content-between.align-items-center.mb-1
+                                            h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
+                                            div.d-flex.gap-2
+                                                button.btn.btn-link.p-0.text-danger
+                                                    i.bi.bi-heart-fill.fs-5
+                                                button.btn.btn-link.p-0.text-muted
+                                                    i.bi.bi-heartbreak-fill.fs-5
 
-                    div.col
-                        div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                            img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=3" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                            div.card-body.px-2.pt-3
-                                div.d-flex.justify-content-between.align-items-center.mb-2
-                                    h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 3
-                                    div.d-flex.gap-2
-                                        button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                            i.bi.bi-heart-fill ❤️
-                                        button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                            i.bi.bi-heartbreak-fill 💔
-                                p.card-text.text-muted.text-truncate El que lo lee se la cooo...
+                                        div.d-flex.align-items-center.gap-1.mb-2
+                                            span.text-warning.small
+                                                i.bi.bi-star-fill.me-1
+                                                span.fw-bold.text-dark= publicacion.promedioValoracion
+                                            span.text-muted.small= `(${publicacion.cantidadVotos} votos)`
 
+                                        p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
 
+                                        div.d-flex.justify-content-between.align-items-center.border-top.pt-2.mt-2
+                                            button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="button")
+                                                i.bi.bi-bag-check-fill
+                                                | Detalles
+                                            
+                                            button.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
+                                                i.bi.bi-chat-left-text-fill
+                                                span.badge.bg-dark.ms-1= publicacion.comentarios ? publicacion.comentarios.length : 0
+                    else
+                        div.col-12.text-center.py-5.my-auto
+                            i.bi.bi-camera.text-secondary.opacity-25(style="font-size: 4rem;")
+                            h5.fw-bold.text-secondary.mt-3 Este usuario todavía no subió fotos.
+
+            //PESTAÑA B: PUBLICACIONES DE USUARIOS QUE SIGO
+            if esPropioPerfil
+                div.tab-pane.fade.flex-grow-1.d-flex.flex-column(id="seguidos" role="tabpanel" aria-labelledby="seguidos-tab")
+                    div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
+                        if publicacionesSeguidos && publicacionesSeguidos.length > 0
+                            each publicacion in publicacionesSeguidos
+                                div.col
+                                    div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
+                                        
+                                        div.position-relative.overflow-hidden.rounded-3
+                                            if publicacion.imagenes && publicacion.imagenes[0]
+                                                img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 220px; w-100;")
+
+                                        div.card-body.px-2.pt-3
+                                            div.d-flex.justify-content-between.align-items-center.mb-1
+                                                h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
+                                                div.d-flex.gap-2
+                                                    button.btn.btn-link.p-0.text-danger
+                                                        i.bi.bi-heart-fill.fs-5
+                                            
+                                            p.text-primary.small.fw-bold.mb-1= `@${publicacion.autor.username}`
+                                            p.card-text.text-muted.text-truncate.small.mb-2= publicacion.descripcion
+                        else
+                            div.col-12.text-center.py-5.my-auto
+                                i.bi.bi-people.text-secondary.opacity-25(style="font-size: 4rem;")
+                                h5.fw-bold.text-secondary.mt-3 No hay novedades por acá
+                                p.text-muted Las fotos de los artistas que sigas aparecerán en este bloque.
+
+        //Paginacion
+        nav.mt-auto.pt-4(aria-label="Paginación de perfil")
+            ul.pagination.justify-content-center.mb-0
+                li.page-item.disabled
+                    a.page-link(href="#") Anterior
+                li.page-item.active
+                    a.page-link(href="#") 1
+                li.page-item
+                    a.page-link(href="#") Siguiente
