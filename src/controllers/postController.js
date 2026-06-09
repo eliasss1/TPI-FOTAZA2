@@ -81,38 +81,53 @@ module.exports = {
 
     mostrarPerfil: async (req, res) => {
         try {
-            const usuarioId = req.session.usuario.id;
 
-            
-            const publicaciones = await Publicacion.findAll({
-                where: { usuario_id: usuarioId },
-                include: [
-                    { model: Imagen, as: 'imagenes' },
-                    { model: Comentario, as: 'comentarios',
-                        include: [{ model: Usuario, as: 'autor'}]
-                    }
-                ],
-                order: [['createdAt', 'DESC']]
-            });
+            const usuarioId = req.params.id ? req.params.id : req.session.usuario.id;
+            const esPropioPerfil = (usuarioId == req.session.usuario.id);
 
-            
-            const usuarioDb = await Usuario.findByPk(usuarioId, {
+            const usuarioPerfil = await Usuario.findByPk(usuarioId, {
                 include: [
                     { model: Usuario, as: 'Seguidos' },
                     { model: Usuario, as: 'Seguidor' }
                 ]
             });
 
-            const cantidadSeguidores = usuarioDb?.Seguidor?.length || 0;
-            const cantidadSeguidos = usuarioDb?.Seguidos?.length || 0;
+            
+            if (!usuarioPerfil) {
+                return res.redirect('/');
+            }
+
+            const publicaciones = await Publicacion.findAll({
+                where: { usuario_id: usuarioId },
+                include: [
+                    { model: Imagen, as: 'imagenes' },
+                    { model: Comentario, as: 'comentarios',
+                        include: [{ model: Usuario, as: 'autor'}]
+                    },
+                    { model: Usuario, as: 'autor' }
+                ],
+                order: [['createdAt', 'DESC']]
+            });
+            
+            //Le cargo los seguidores
+            const cantidadSeguidores = usuarioPerfil.Seguidor ? usuarioPerfil.Seguidor.length : 0;
+            const cantidadSeguidos = usuarioPerfil.Seguidos ? usuarioPerfil.Seguidos.length : 0;
+            
+            //Verifico si ya lo sigue
+            let yaLoSigue = false;
+            if (!esPropioPerfil) {
+                yaLoSigue = usuarioPerfil.Seguidor?.some(seguidor => seguidor.id === req.session.usuario.id) || false;
+            }
 
         
             res.render('perfil', { 
-                titulo: 'Mi Perfil', 
+                titulo: `Perfil de ${usuarioPerfil.username}`, 
                 publicaciones,
-                esPropioPerfil: true,
+                esPropioPerfil,
                 cantidadSeguidores,
                 cantidadSeguidos,
+                usuarioPerfil,
+                yaLoSigue,
                 publicacionesSeguidos: []
             });
         } catch (error) {

@@ -37,9 +37,9 @@ block content
                                 
                                 //Esto verifica por las dudas de q no se incluya un autor, por las dudas jajaj
                                 if publicacion.autor
-                                    a.text-primary.text-decoration-none.small.fw-bold.d-block.mb-1(href=`/perfil/${publicacion.autor.id}`)
-                                        i.bi.bi-person-circle.me-1
-                                        = `@${publicacion.autor.username}`
+                                    a.text-primary.text-decoration-none.small.fw-bold.d-block.mb-1(href="/perfil/" + publicacion.usuario_id) #{publicacion.autor.username}
+                                        //i.bi.bi-person-circle.me-1
+                                        //= `@${publicacion.autor.username}`
                                 else
                                     span.text-muted.small.d-block.mb-1
                                         i.bi.bi-person-circle.me-1

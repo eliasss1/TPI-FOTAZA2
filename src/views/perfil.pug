@@ -10,10 +10,10 @@ block content
                 div.d-flex.align-items-center.gap-3
                     
                     div.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold(style="width: 70px; height: 70px; font-size: 2rem;")
-                        = usuario.username.charAt(0).toUpperCase()
+                        = usuarioPerfil.username.charAt(0).toUpperCase()
                     <div>
-                        h2.fw-bold.mb-1.text-dark= usuario.username
-                        p.text-muted.small.mb-0= usuario.email
+                        h2.fw-bold.mb-1.text-dark= usuarioPerfil.username
+                        p.text-muted.small.mb-0= usuarioPerfil.email
                     </div>
             
             //Seguidores
@@ -32,7 +32,7 @@ block content
                         i.bi.bi-plus-circle-fill.me-1
                         | Nueva Publicación
                 else
-                    form(action=`/usuario/seguir/${usuario.id}` method="POST")
+                    form(action=`/usuario/seguir/${usuarioPerfil.id}` method="POST")
                         if yaLoSigue
                             button.btn.btn-secondary.btn-sm.w-100(type="submit") Dejar de seguir
                         else
@@ -100,7 +100,7 @@ block content
                                                 button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
                                                     img(src="/images/comentario.png" style="height: 20px; width: 20px")
 
-                                //VENTANA MODAL DE COMENTARIOS (esta un toque incompleta porque nose hacerle bien la logica al modal, pero supongo que esta listo)
+                                //VENTANA MODAL DE COMENTARIOS
                                 div.modal.fade(id=`modalComentario-${publicacion.id}` tabindex="-1" aria-hidden="true")
                                     div.modal-dialog.modal-dialog-centered 
                                         div.modal-content.border-0.shadow-lg

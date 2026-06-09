@@ -4,6 +4,7 @@ const postController = require('../controllers/postController');
 const estaAutenticado = require('../middlewares/authMiddleware');
 
 router.get('/', postController.mostrarFeed);
+router.get('/perfil/:id', estaAutenticado, postController.mostrarPerfil);
 router.get('/nueva-publicacion', estaAutenticado, postController.mostrarFormulario);
 router.post('/publicaciones/crear', estaAutenticado, postController.crearPublicacion);
 
