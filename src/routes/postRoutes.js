@@ -7,4 +7,6 @@ router.get('/', postController.mostrarFeed);
 router.get('/nueva-publicacion', estaAutenticado, postController.mostrarFormulario);
 router.post('/publicaciones/crear', estaAutenticado, postController.crearPublicacion);
 
+router.get('/perfil', estaAutenticado, postController.mostrarPerfil);
+
 module.exports = router;

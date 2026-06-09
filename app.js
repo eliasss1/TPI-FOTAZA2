@@ -42,10 +42,6 @@ const estaAutenticado = require('./src/middlewares/authMiddleware');
 
 // Iniciar el servidor
 
-app.get('/perfil', estaAutenticado, (req, res) => {
-    res.render('perfil');
-});
-
 app.get('/moderacion', estaAutenticado, (req, res) => {
     res.render('moderacion');
 });

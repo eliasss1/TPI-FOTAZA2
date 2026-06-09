@@ -6,18 +6,10 @@ const path = require('path');
 module.exports = {
     mostrarFeed: async (req, res) => {
         try {
-            const estaLogueado = req.session.usuario ? true : false;
-            
-            const condicionImagen = estaLogueado ? {} : { tipo_licencia: 'sin_copyright'};
-
             const publicaciones = await Publicacion.findAll({
                 include: [
-                    {   model: Usuario, as: 'autor', attributes: ['username']},
-                    {   model: Imagen, 
-                        as: 'imagenes',
-                        where: condicionImagen,
-                        required: true
-                    }
+                    { model: Usuario, as: 'autor', attributes: ['username']},
+                    { model: Imagen, as: 'imagenes'}
                 ],
                 order: [['createdAt', 'DESC']]
             });
@@ -26,6 +18,7 @@ module.exports = {
             console.error('Error al cargar el feed:', error);
             res.status(500).send('Error interno');
         } 
+        
     },
 
     mostrarFormulario: (req, res) => {
@@ -80,5 +73,45 @@ module.exports = {
                 res.status(500).send('Error al guardar en la base de datos');
             }
         });
+    },
+
+    mostrarPerfil: async (req, res) => {
+        try {
+            const usuarioId = req.session.usuario.id;
+
+            
+            const publicaciones = await Publicacion.findAll({
+                where: { usuario_id: usuarioId },
+                include: [{ model: Imagen, as: 'imagenes' }],
+                order: [['createdAt', 'DESC']]
+            });
+
+            
+            const usuarioDb = await Usuario.findByPk(usuarioId, {
+                include: [
+                    { model: Usuario, as: 'Seguidos' },
+                    { model: Usuario, as: 'Seguidor' }
+                ]
+            });
+
+            const cantidadSeguidores = usuarioDb?.Seguidor?.length || 0;
+            const cantidadSeguidos = usuarioDb?.Seguidos?.length || 0;
+
+        
+            res.render('perfil', { 
+                titulo: 'Mi Perfil', 
+                publicaciones,
+                esPropioPerfil: true,
+                cantidadSeguidores,
+                cantidadSeguidos,
+                publicacionesSeguidos: []
+            });
+        } catch (error) {
+            console.error('Error al cargar los datos del perfil:', error);
+            res.status(500).send('Error interno del servidor');
+        }
     }
+
 };
+
+
