@@ -11,9 +11,9 @@ router.post('/publicaciones/crear', estaAutenticado, postController.crearPublica
 router.get('/perfil', estaAutenticado, postController.mostrarPerfil);
 router.post('/comentar/:id', estaAutenticado, postController.crearComentario);
 
-router.get('/moderacion', estaAutenticado, esModerador, (req, res) => {
-    res.render('moderacion');
-});
+router.get('/moderacion', estaAutenticado, esModerador, postController.mostrarModeracion);
+router.post('/moderacion/rechazar/:id', estaAutenticado, esModerador, postController.rechazarDenuncia);
+router.post('/moderacion/aceptar/:id', estaAutenticado, esModerador, postController.aceptarDenuncia);
 router.post('/denuncia/:id', estaAutenticado, postController.crearDenuncia);
 
 router.get('/notificaciones', estaAutenticado, postController.mostrarNotificaciones);

@@ -28,8 +28,10 @@ block content
                                 p.text-danger.fw-semibold.mb-2 Motivo: "#{denuncia.motivo}"
                                 p.small.text-secondary Justificación: "#{denuncia.justificacion}"
                             div.d-flex.px-5.py-2.gap-2 
-                                button.btn.btn-danger.text-white(style="height: 40px;" data=denuncia.id) Rechazar
-                                button.btn.btn-success.text-white(style="height: 40px;" data-id=denuncia.id) Aceptar
+                                form(action=`/moderacion/rechazar/${denuncia.id}` method="POST" style="display:inline;")
+                                    button.btn.btn-danger.text-white(type="submit" style="height: 40px;") Rechazar
+                                form(action=`/moderacion/aceptar/${denuncia.id}` method="POST" style="display:inline;")
+                                    button.btn.btn-success.text-white(type="submit" style="height: 40px;") Aceptar
                 else 
                     div.d-flex.border-bottom.border-1.bg-light.shadow-lg(style="height: 60px; overflow: hidden; white-space: nowrap")
                         div.border-end.border-2.px-2
