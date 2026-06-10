@@ -14,4 +14,5 @@ router.post('/comentar/:id', estaAutenticado, postController.crearComentario);
 router.get('/moderacion', estaAutenticado, esModerador, (req, res) => {
     res.render('moderacion');
 });
+router.post('/denuncia/:id', estaAutenticado, postController.crearDenuncia);
 module.exports = router;

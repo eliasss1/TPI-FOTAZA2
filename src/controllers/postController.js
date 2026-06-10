@@ -156,7 +156,40 @@ module.exports = {
         }
     },
 
-    
+    crearDenuncia: async (req, res) => {
+    try {
+        const publicacionId = req.params.id;
+        const usuarioId = req.session.usuario.id;
+        const { motivo, justificacion } = req.body;
+
+        const { Denuncia, Publicacion} = require('../models');
+        const denunciaExistente = await Denuncia.findOne({
+            where: { publicacion_id: publicacionId, usuario_id: usuarioId}
+        });
+        if (denunciaExistente) {
+            console.log("El usuario ya denuncio esta publicacion.");
+            return res.redirect('/');
+        }
+
+        await Denuncia.create({
+            motivo: motivo,
+            justificacion: justificacion,
+            publicacion_id: publicacionId,
+            usuario_id: usuarioId
+        });
+
+        await Publicacion.update(
+            {bloquear_edicion: true},
+            { where: {id: publicacionId}}
+        );
+
+        console.log(`Publicaion ${publicacionId} denunciada con exito.`);
+        res.redirect('/');
+    } catch (error) {
+        console.error("Error al crear la denuncia:", error);
+        res.status(500).send("Error interno al procesar la denuncia");
+    }
+}
 
 };
 

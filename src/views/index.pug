@@ -16,6 +16,8 @@ block content
         
             if publicaciones && publicaciones.length > 0
                 each publicacion in publicaciones
+                    
+                    //- REQUISITO CÁTEDRA: Usuarios anónimos solo ven fotos sin copyright
                     if usuario || (publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'sin_copyright')
                         div.col
                             //El contenedor de la foto especifica
@@ -47,6 +49,7 @@ block content
                                     //Título, Like y Dislike
                                     div.d-flex.justify-content-between.align-items-center.mb-1
                                         h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
+                
                                         if usuario
                                             div.d-flex.gap-2
                                                 button.btn.btn-link.p-0.text-danger(title="Me gusta")

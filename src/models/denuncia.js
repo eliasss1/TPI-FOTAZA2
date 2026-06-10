@@ -11,6 +11,10 @@ const Denuncia = sequelize.define('Denuncia', {
         type: DataTypes.STRING(255),
         allowNull: false
     },
+    justificacion: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
     resuelta: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
