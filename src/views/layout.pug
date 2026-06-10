@@ -69,13 +69,17 @@ html(lang="es")
                 a.nav-link.p-2.link-dark.fw-semibold(href="/perfil") 
                   img.menu-icono.ms-2.me-3(src="images/usuario.png" alt="Icono")
                   span Mi Perfil
-              
+              li.nav-item
+                a.nav-link.p-2.link-dark.fw-semibold(href="/notificaciones") 
+                  img.menu-icono.ms-2.me-3(src="images/notificaciones.png" alt="Icono")
+                  span Notificaciones
               
               if usuario.rol === 'validador'
                 li.nav-item
                   a.nav-link.p-2.link-danger.fw-semibold(href="/moderacion") 
                     i.bi.bi-shield-lock-fill.ms-2.me-3.fs-4
                     span Moderación
+
 
       div.container.mt-auto.mb-auto  
           block content
