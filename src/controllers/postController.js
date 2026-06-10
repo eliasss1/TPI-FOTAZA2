@@ -1,4 +1,4 @@
-const { Publicacion, Imagen, Usuario, Comentario} = require('../models');
+const { Publicacion, Imagen, Usuario, Comentario, Notificacion} = require('../models');
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
@@ -148,6 +148,20 @@ module.exports = {
                 publicacion_id: idPublicacion
             });
             
+                        
+            const publicacion = await Publicacion.findByPk(idPublicacion);
+            
+            if (publicacion && publicacion.usuario_id !== idUsuario) {
+                
+                
+                await Notificacion.create({
+                    tipo_evento: 'comentario',
+                    mensaje: 'Ha comentado en tu publicación.', 
+                    usuario_id: publicacion.usuario_id, 
+                    actor_id: idUsuario
+                });
+            }
+            
             res.redirect(req.get('Referrer') || '/');
 
         }catch(error){
@@ -189,7 +203,42 @@ module.exports = {
         console.error("Error al crear la denuncia:", error);
         res.status(500).send("Error interno al procesar la denuncia");
     }
-}
+},
+
+mostrarNotificaciones: async (req, res) => {
+        try {
+            const usuarioId = req.session.usuario.id;
+            const notificaciones = await Notificacion.findAll({
+                where: { usuario_id: usuarioId },
+                include: [{
+                    model: Usuario,
+                    as: 'actor' 
+                }],
+                order: [['createdAt', 'DESC']]
+            });
+            res.render('notificaciones', { 
+                titulo: 'Mis Notificaciones', 
+                notificaciones 
+            });
+        } catch (error) {
+            console.error('Error al cargar notificaciones:', error);
+            res.status(500).send('Error interno del servidor');
+        }
+    },
+
+    marcarNotificacionLeida: async (req, res) => {
+        try {
+            const idNotificacion = req.params.id;
+            await Notificacion.update(
+                { leida: true },
+                { where: { id: idNotificacion, usuario_id: req.session.usuario.id } }
+            );
+            res.redirect('/notificaciones');
+        } catch (error) {
+            console.error('Error al marcar como leída:', error);
+            res.redirect('/notificaciones');
+        }
+    }
 
 };
 

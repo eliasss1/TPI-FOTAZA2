@@ -1,4 +1,52 @@
 extends layout
 
 block content
-    div.container.bg-light.shadow-lg.p-2.rounded-1(style="min-height: calc(100vh - 5rem);")
+
+    style. 
+        .opcion-filtro {
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        .opcion-filtro:hover {
+            width:210px;
+            background-color: rgba(20, 86, 184, 0.85); 
+        }
+
+    div.container.bg-light.shadow-lg.p-4.rounded-1(style="height: calc(100vh - 5rem); overflow: auto")
+        //Cabecera de la vista
+        div.border-bottom.border-1.mb-2.p-2.d-flex 
+            div(style="width: 500px")   
+                h4.text-secondary Bandeja de Notificaciones
+            div.opcion-filtro.border-start.border-1
+                h5.text-muted.py-auto.px-3 Ver Todos
+            div.opcion-filtro.border-start.border-1
+                h5.text-muted.py-auto.px-3 Seguidores
+            div.opcion-filtro.border-start.border-1
+                h5.text-muted.py-auto.px-3 Comentarios
+            div.opcion-filtro.border-start.border-1
+                h5.text-muted.py-auto.px-3 Interesados
+            
+        //Este es el contenedor que guarda las notificaciones 
+        div.bg-light.d-flex.flex-column.overflow-auto(style="height: 750px;")
+            
+            if notificaciones && notificaciones.length > 0
+                each notificacion in notificaciones
+                    
+                    div.card.d-flex.flex-row.shadow-sm.p-2.gap-2.mb-2(class=notificacion.leida ? "bg-white" : "bg-light border-primary")
+                        div.d-flex.flex-row.border-end.border-1.gap-3.p-2(style="width:800px")
+                            div.border-end.border-1.pe-2
+                                
+                                strong.text-primary #{notificacion.actor.username} 
+                            
+                            p.card-text.text-center.text-muted.text-truncate #{notificacion.mensaje} 
+                        div.border-end.border-1.d-flex.p-2(style="width:200px")
+                            
+                            p.card-text.text-muted #{new Date(notificacion.createdAt).toLocaleDateString()}
+
+                        if !notificacion.leida
+                            form(action=`/notificaciones/leer/${notificacion.id}` method="POST")
+                                button.ms-2.btn.btn-success.opacity-75(type="submit" style="height: 40px; width: 180px") Marcar como leido
+            else
+                div.text-center.py-5.my-auto
+                    i.bi.bi-bell-slash.text-secondary.opacity-25(style="font-size: 4rem;")
+                    h5.fw-bold.text-secondary.mt-3 No tienes notificaciones nuevas

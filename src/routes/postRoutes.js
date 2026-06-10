@@ -15,4 +15,8 @@ router.get('/moderacion', estaAutenticado, esModerador, (req, res) => {
     res.render('moderacion');
 });
 router.post('/denuncia/:id', estaAutenticado, postController.crearDenuncia);
+
+router.get('/notificaciones', estaAutenticado, postController.mostrarNotificaciones);
+router.post('/notificaciones/leer/:id', estaAutenticado, postController.marcarNotificacionLeida);
+
 module.exports = router;

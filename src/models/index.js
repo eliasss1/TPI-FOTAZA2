@@ -8,12 +8,20 @@ const Imagen = require('./imagen');
 const Comentario = require('./comentario');
 const Etiqueta = require('./etiqueta');
 const Denuncia = require('./denuncia');
+const Notificacion = require('./notificacion');
 
 
 // asociaciones
 //un usuario tiene muchas publicaciones
 Usuario.hasMany(Publicacion, {foreignKey: 'usuario_id', as: 'publicaciones'});
 Publicacion.belongsTo(Usuario, {foreignKey: 'usuario_id', as:'autor'});
+
+// Un usuario RECIBE muchas notificaciones
+Usuario.hasMany(Notificacion, { foreignKey: 'usuario_id', as: 'notificaciones' });
+Notificacion.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'receptor' });
+
+// Una notificación es PROVOCADA por otro usuario (actor)
+Notificacion.belongsTo(Usuario, { foreignKey: 'actor_id', as: 'actor' });
 
 //una publicacion tiene muchas imagenes (si se borra la publicacion se borran las imagenes)
 Publicacion.hasMany(Imagen, {foreignKey: 'publicacion_id', as: 'imagenes', onDelete: 'CASCADE'});
@@ -58,5 +66,6 @@ module.exports = {
     Imagen,
     Comentario,
     Etiqueta,
-    Denuncia
+    Denuncia,
+    Notificacion
 };
