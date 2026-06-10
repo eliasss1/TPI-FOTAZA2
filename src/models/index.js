@@ -9,12 +9,20 @@ const Comentario = require('./comentario');
 const Etiqueta = require('./etiqueta');
 const Denuncia = require('./denuncia');
 const Notificacion = require('./notificacion');
-
+const Coleccion = require('./coleccion');
 
 // asociaciones
 //un usuario tiene muchas publicaciones
 Usuario.hasMany(Publicacion, {foreignKey: 'usuario_id', as: 'publicaciones'});
 Publicacion.belongsTo(Usuario, {foreignKey: 'usuario_id', as:'autor'});
+
+// Un usuario es dueño de muchas colecciones
+Usuario.hasMany(Coleccion, { foreignKey: 'usuario_id', as: 'colecciones' });
+Coleccion.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'dueño' });
+
+// Relacion MUCHOS A MUCHOS entre Coleccion y Publicacion
+Coleccion.belongsToMany(Publicacion, { through: 'coleccion_publicaciones', as: 'publicaciones', foreignKey: 'coleccion_id' });
+Publicacion.belongsToMany(Coleccion, { through: 'coleccion_publicaciones', as: 'colecciones', foreignKey: 'publicacion_id' });
 
 // Un usuario RECIBE muchas notificaciones
 Usuario.hasMany(Notificacion, { foreignKey: 'usuario_id', as: 'notificaciones' });
@@ -67,5 +75,6 @@ module.exports = {
     Comentario,
     Etiqueta,
     Denuncia,
-    Notificacion
+    Notificacion,
+    Coleccion
 };

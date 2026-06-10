@@ -2,71 +2,35 @@ extends layout
 
 block content
 
-    div.container.bg-light.shadow-lg.p-4.d-flex.flex-column.rounded-1(style="min-height: calc(100vh - 5rem);")
-        div.row.mb-5.justify-content-center
+    div.container.bg-white.rounded-1.shadow-lg.p-4.d-flex.flex-column(style="height: calc(100vh - 5rem);")
+        
+        //Barra de busqueda
+        div.row.mb-4.justify-content-center
             div.col-md-8
                 form.d-flex.gap-2(action="/buscar" method="GET")
-                    input.form-control.form-control-lg.border-2(type="text" name="query" placeholder="Buscar fotos por título o descripción...")
-                    button.btn.btn-primary.btn-lg(type="submit") Buscar
+                    input.form-control.border-2(type="text" name="query" placeholder="Buscar colecciones, o etiquetas...")
+                    button.btn.btn-primary(type="submit") Buscar
+        div.d-flex.flex-row.justify-content-between.p-3.mb-4.border-top.border-1
+            h3.fw-bold.text-secondary Mis Colecciones
+            div.d-flex.gap-2.align-items-center
+                h5.text-muted Agregar coleccion
+                button.btn.btn-secondary(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${usuario.id}`) +
+        div.row.g-4
+            if colecciones && colecciones.length > 0
+                each coleccion in colecciones
+                    div.col-md-4.col-lg-3
+                        div.card.h-100.border-0.shadow-sm.bg-white
+                            div.card-body.d-flex.flex-column.align-items-center.text-center.py-5
+                                i.bi.bi-folder-fill.text-primary.mb-3(style="font-size: 3rem;")
+                                h5.card-title.fw-bold.text-dark= coleccion.nombre
+                                p.small.text-muted= `${coleccion.publicaciones.length} elementos`
+                                // Enlace oculto que cubre toda la tarjeta
+                                a.stretched-link(href=`/colecciones/${coleccion.id}`)
+            else
+                div.col-12.text-center.py-5
+                    i.bi.bi-folder-x.text-secondary.opacity-25(style="font-size: 4rem;")
+                    h5.text-muted.mt-3 Aún no has creado ninguna colección.
+                    button.btn.btn-secondary.opacity-50(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${usuario.id}`) Agrega una aqui
+        
 
-    
-        div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
 
-            div.col
-                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=1" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                    div.card-body.px-2.pt-3
-                        div.d-flex.justify-content-between.align-items-center.mb-2
-                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 1
-                            div.d-flex.gap-2
-                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                    i.bi.bi-heart-fill ❤️
-                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                    i.bi.bi-heartbreak-fill 💔
-                        p.card-text.text-muted.text-truncate re pro wacho. 
-
-            div.col
-                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=2" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                    div.card-body.px-2.pt-3
-                        div.d-flex.justify-content-between.align-items-center.mb-2
-                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 2
-                            div.d-flex.gap-2
-                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                    i.bi.bi-heart-fill ❤️
-                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                    i.bi.bi-heartbreak-fill 💔
-                        p.card-text.text-muted.text-truncate pipuuuu pipuuu pi puuuu.          
-
-            div.col
-                div.bg-light.border.border-1.border-secondary.shadow-lg.p-2
-                    img.card-img-top.rounded-3.img-fluid(src="https://picsum.photos/400/300?random=3" alt="Foto de ejemplo" style="object-fit: cover; height: 250px;")
-                    div.card-body.px-2.pt-3
-                        div.d-flex.justify-content-between.align-items-center.mb-2
-                            h5.card-title.text-truncate.mb-0.fw-bold Foto ejemplo 3
-                            div.d-flex.gap-2
-                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                    i.bi.bi-heart-fill ❤️
-                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                    i.bi.bi-heartbreak-fill 💔
-                        p.card-text.text-muted.text-truncate El que lo lee se la cooo...
-            
-    
-        nav.mt-auto.pt-4(aria-label="Paginacion de colecciones")
-            //Solo muestra la webada esa de abajo si hay más de 1 pagina en total
-            if totalPaginas > 1
-                ul.pagination.justify-content-center.mb-0
-                
-                //Boton Anterior: Se desactiva (.disabled) si estás en la pagina 1
-                li(class=`page-item ${paginaActual === 1 ? 'disabled' : ''}`)
-                    a.page-link(href=`/colecciones?page=${paginaActual - 1}`) Anterior
-                
-                //Este bucle te tira la cantidad de numeros de pagina (el backend lo hacemos dps)
-                - var n = 1;
-                while n <= totalPaginas
-                    li(class=`page-item ${paginaActual === n ? 'active' : ''}`)
-                    a.page-link(href=`/colecciones?page=${n}`)= n++
-                
-                //Boton Siguiente: Se desactiva si estas en la ultima pagina
-                li(class=`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`)
-                    a.page-link(href=`/colecciones?page=${paginaActual + 1}`) Siguiente

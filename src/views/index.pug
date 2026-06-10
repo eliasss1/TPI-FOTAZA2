@@ -12,12 +12,12 @@ block content
                     button.btn.btn-primary(type="submit") Buscar
 
         //El contenedor de fotos
-        div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
+        div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start.overflow-auto
         
             if publicaciones && publicaciones.length > 0
                 each publicacion in publicaciones
                     
-                    //- REQUISITO CÁTEDRA: Usuarios anónimos solo ven fotos sin copyright
+                    
                     if usuario || (publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'sin_copyright')
                         div.col
                             //El contenedor de la foto especifica
@@ -87,6 +87,9 @@ block content
                                             if usuario.id !== publicacion.usuario_id
                                                 button.btn.btn-outline-danger.btn-sm.border-0(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
                                                     img(src="/images/bandera.png" style="height: 20px; width: 20px")
+
+                                            button.btn.btn-outline-secondary.border-0(data-bs-toggle="modal" data-bs-target=`#modalColeccion-${publicacion.id}`)
+                                                i.bi.bi-bookmark-fill.text-primary        
                                     else
                                         div.border-top.pt-2.mt-2.text-center
                                             span.badge.bg-secondary.text-wrap Inicia sesión para comentar, valorar o denunciar
@@ -137,24 +140,38 @@ block content
                                                         div.mb-3
                                                             label.form-label.fw-bold.text-secondary Motivo de la Denuncia
                                                             select.form-select(name="motivo" required)
-                                                                option(value="" disabled selected) Seleccioná una opción...
+                                                                option(value="" disabled selected) Seleccioná una opcion...
                                                                 option(value="copyright") Infracción de Copyright / Plagio
                                                                 option(value="inapropiado") Contenido Inapropiado / Ofensivo
                                                                 option(value="spam") Spam o Contenido Engañoso
                                                                 option(value="otros") Otros motivos
                                                         
                                                         div.mb-3
-                                                            label.form-label.fw-bold.text-secondary Descripción / Justificación Corta
+                                                            label.form-label.fw-bold.text-secondary Descripcion / Justificacion Corta
                                                             textarea.form-control(name="justificacion" rows="3" required placeholder="Detallá de forma breve tu denuncia...")
                                                         
                                                         div.d-flex.justify-content-end.gap-2.mt-4
                                                             button.btn.btn-light(type="button" data-bs-dismiss="modal") Cancelar
                                                             button.btn.btn-danger(type="submit") Enviar Denuncia
+
+                                // VENTANITA MODAL PARA SUBIR A UNA COLECCION
+                                div.modal.fade(id=`modalColeccion-${publicacion.id}`)
+                                    div.modal-dialog.modal-dialog-centered
+                                        div.modal-content.border-0.shadow-lg
+                                            div.modal-header.bg-light.border-0
+                                                h5.modal-title Guardar en Coleccion
+                                                button.btn-close(data-bs-dismiss="modal")
+                                            div.modal-body
+                                                form(action=`/colecciones/guardar/${publicacion.id}` method="POST")
+                                                    div.mb-3
+                                                        label.form-label.text-muted.small Nombre de la Coleccion
+                                                        input.form-control.bg-light.border-0(type="text" name="nombreColeccion" placeholder="Ej: Paisajes, Inspiracion..." required)
+                                                    button.btn.btn-primary.w-100(type="submit") Guardar Publicación                            
             else
                 div.col-12.text-center.py-5.my-auto
                     i.bi.bi-image-fill.text-secondary.opacity-25(style="font-size: 5rem;")
                     h4.fw-bold.text-secondary.mt-3 No hay publicaciones disponibles
-                    p.text-muted Las fotos que suba la comunidad aparecerán automáticamente en este feed.
+                    p.text-muted Las fotos que suba la comunidad apareceran automaticamente en este feed.
 
         //Paginacion
         nav.mt-auto.pt-4(aria-label="Paginacion de fotos")

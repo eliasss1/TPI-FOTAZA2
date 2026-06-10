@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const {
     Publicacion,
     Imagen,
@@ -5,6 +6,7 @@ const {
     Comentario,
     Notificacion,
     Denuncia,
+    Coleccion
 } = require("../models");
 const formidable = require("formidable");
 const fs = require("fs");
@@ -418,4 +420,33 @@ module.exports = {
             res.status(500).send("Error interno al procesar la baja");
         }
     },
+
+    crearColeccionYGuardar: async (req, res) => {
+
+        try {
+            const idPublicacion = req.params.id;
+            const nombreColeccion = req.body.nombreColeccion; 
+            const idUsuario = req.session.usuario.id; 
+
+            
+            const [coleccion] = await Coleccion.findOrCreate({
+                where: { nombre: nombreColeccion, usuario_id: idUsuario }
+            });
+
+            
+            const publicacion = await Publicacion.findByPk(idPublicacion);
+
+            
+            if (publicacion) {
+                await coleccion.addPublicacion(publicacion); 
+            }
+
+            res.redirect('back');
+
+        } catch (error) {
+            console.error(error);
+            res.redirect('/');
+        }
+    }
+
 };

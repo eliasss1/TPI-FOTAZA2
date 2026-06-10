@@ -1,67 +1,83 @@
 extends layout
 
 block content
-    div.container.bg-light.shadow-lg.p-2.rounded-1(style="min-height: calc(100vh - 5rem);")
-        h1.text-muted.text-center Gestion de Denuncias y Moderación
-        div.d-flex.aling-items-start.gap-4 
+    style.
+        .opcion-filtro {
+            width: 200px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .opcion-filtro:hover {
+            width: 210px;
+            background-color: rgba(20, 86, 184, 0.85);
+        }
+        
+        .opcion-filtro:hover h5 {
+            color: white !important;
+        }
 
-            //Esta es la barra lateral que flota
-            div.flex-grow-1.p-2.bg-white.shadow-lg(style="width: 200px; height: 700px; margin-left: -80px")
-                h5.fw-bold.mb-3 Menú de Control
-                ul.nav.flex-column.gap-2
-                    li.nav-item
-                        a.nav-link.link-dark.active.fw-semibold(href="#") Denuncias Recibidas
-                    li.nav-item
-                        a.nav-link.link-dark(href="#") Historial de Bajas
-                    li.nav-item
-                        a.nav-link.link-dark(href="#") Usuarios Inactivos
+    div.container.bg-light.shadow-lg.p-4.rounded-1(style="height: calc(100vh - 5rem); overflow: auto")
+        h2.text-muted.text-center.mb-4 Gestión de Denuncias y Moderación
+        
+        
+        div.border-bottom.border-1.mb-4.p-0.d-flex.bg-white.shadow-sm.rounded
+            div.p-3(style="width: 300px")
+                h4.text-secondary.mb-0.mt-1 Filtros de Menú
+            
+            a.opcion-filtro.border-start.border-1(href="/moderacion")
+                h5.text-muted.py-auto.px-3.mb-0 Denuncias Recibidas
+            
+            a.opcion-filtro.border-start.border-1(href="/moderacion?filtro=historial")
+                h5.text-muted.py-auto.px-3.mb-0 Historial de Bajas
+            
+            a.opcion-filtro.border-start.border-1(href="/moderacion?filtro=inactivos")
+                h5.text-muted.py-auto.px-3.mb-0 Usuarios Inactivos
 
-            div.d-flex.flex-column.p-1.bg-white.shadow-lg(style="width: 1100px; height: 700px")
-                if listaDenuncias && listaDenuncias.length > 0
-                    //Aca empieza lo que seria la denuncia, un bucle que le falta la logica aun
-                    each denuncia in listaDenuncias
-                        div.d-flex.border-bottom.border-1.bg-light.shadow-lg(style="height: 60px; overflow: hidden; white-space: nowrap")
-                            div.border-end.border-2.px-2
-                                h5.card-title.fw-bold= denuncia.titulo
-                                p.card-text.text-muted Subido por: @#{denuncia.autor.username}
-                            div.px-2
-                                p.text-danger.fw-semibold.mb-2 Motivo: "#{denuncia.motivo}"
-                                p.small.text-secondary Justificación: "#{denuncia.justificacion}"
-                            div.d-flex.px-5.py-2.gap-2 
-                                form(action=`/moderacion/rechazar/${denuncia.id}` method="POST" style="display:inline;")
-                                    button.btn.btn-danger.text-white(type="submit" style="height: 40px;") Rechazar
-                                form(action=`/moderacion/aceptar/${denuncia.id}` method="POST" style="display:inline;")
-                                    button.btn.btn-success.text-white(type="submit" style="height: 40px;") Aceptar
-                else 
-                    div.d-flex.border-bottom.border-1.bg-light.shadow-lg(style="height: 60px; overflow: hidden; white-space: nowrap")
-                        div.border-end.border-2.px-2
-                            h5.card-title.fw-bold Foto Ejemplo Denunciada
-                            p.card-text.text-muted Subido por: @usuario_facha
-                        div.px-2
-                            p.text-danger.fw-semibold.mb-2 Motivo: "Contenido inapropiado / Copyright"
-                            p.small.text-secondary Justificación: "El usuario se robó esta foto de mi feed de Instagram sin permiso."
-                        div.d-flex.px-5.py-2.gap-2 
-                            button.btn.btn-danger.text-white(style="height: 40px;") Rechazar
-                            button.btn.btn-success.text-white(style="height: 40px;") Aceptar
+        
+        div.d-flex.flex-column.p-1.bg-white.shadow-sm.rounded(style="width: 100%; min-height: 500px")
+            if listaDenuncias && listaDenuncias.length > 0
+                each denuncia in listaDenuncias
+                    div.d-flex.border-bottom.border-1.bg-light.shadow-sm.mb-2.p-2(style="overflow: hidden;")
+                        
+                        n
+                        div.border-end.border-2.px-3(style="min-width: 250px;")
+                            h5.card-title.fw-bold= denuncia.titulo
+                            p.card-text.text-muted Subido por: @#{denuncia.autor.username}
+                        
+                        
+                        div.px-3.flex-grow-1
+                            p.text-danger.fw-semibold.mb-1 Motivo: "#{denuncia.motivo}"
+                            p.small.text-secondary.mb-0 Justificación: "#{denuncia.justificacion}"
+                        
+                        
+                        div.d-flex.px-4.py-2.gap-2.align-items-center
+                            
+                            form(action=`/moderacion/rechazar/${denuncia.id}` method="POST" style="margin: 0;")
+                                button.btn.btn-danger.text-white(type="submit" style="height: 40px;") Rechazar
+                            
+                            
+                            form(action=`/moderacion/aceptar/${denuncia.id}` method="POST" style="margin: 0;")
+                                button.btn.btn-success.text-white(type="submit" style="height: 40px;") Aceptar
+            else
+                
+                div.text-center.py-5.my-auto
+                    i.bi.bi-shield-check.text-secondary.opacity-25(style="font-size: 4rem;")
+                    h5.fw-bold.text-secondary.mt-3 No hay denuncias pendientes. ¡Todo en orden!
 
-                //Aca esta la barrita esa de navegacion para hacerle la logica
-                nav.mt-auto.pt-4(aria-label="Paginacion de denuncias")
-                //Solo muestra la webada esa de abajo si hay más de 1 pagina en total
-                if totalPaginas > 1
-                    ul.pagination.justify-content-center.mb-0
-                    
-                    //Boton Anterior: Se desactiva (.disabled) si estás en la pagina 1
+        
+        if totalPaginas > 1
+            nav.mt-auto.pt-4(aria-label="Paginacion de denuncias")
+                ul.pagination.justify-content-center.mb-0
                     li(class=`page-item ${paginaActual === 1 ? 'disabled' : ''}`)
                         a.page-link(href=`/moderacion?page=${paginaActual - 1}`) Anterior
                     
-                    //Este bucle te tira la cantidad de numeros de pagina (el backend lo hacemos dps)
                     - var n = 1;
                     while n <= totalPaginas
                         li(class=`page-item ${paginaActual === n ? 'active' : ''}`)
-                        a.page-link(href=`/moderacion?page=${n}`)= n++
+                            a.page-link(href=`/moderacion?page=${n}`)= n++
                     
-                    //Boton Siguiente: Se desactiva si estas en la ultima pagina
                     li(class=`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`)
                         a.page-link(href=`/moderacion?page=${paginaActual + 1}`) Siguiente
-
-
