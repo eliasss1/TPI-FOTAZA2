@@ -11,14 +11,14 @@ block content
                     
                     div.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold(style="width: 70px; height: 70px; font-size: 2rem;")
                         = usuarioPerfil.username.charAt(0).toUpperCase()
-                    <div>
+                    div
                         h2.fw-bold.mb-1.text-dark= usuarioPerfil.username
                         p.text-muted.small.mb-0= usuarioPerfil.email
-                    </div>
+                    
             
             //Seguidores
             div.col-md-4.text-md-end.mt-3.mt-md-0
-                div.d-flex.justify-content-md-end.gap-4.mb-3
+                div.d-flex.justify-content-end.gap-4.mb-3
                     div.text-center
                         h4.fw-bold.mb-0.text-primary= cantidadSeguidores
                         small.text-muted seguidores
@@ -32,11 +32,13 @@ block content
                         i.bi.bi-plus-circle-fill.me-1
                         | Nueva Publicación
                 else
-                    form(action=`/usuario/seguir/${usuarioPerfil.id}` method="POST")
-                        if yaLoSigue
-                            button.btn.btn-secondary.btn-sm.w-100(type="submit") Dejar de seguir
-                        else
-                            button.btn.btn-primary.btn-sm.w-100(type="submit") Seguir
+                    div.d-flex.gap-2.justify-content-end
+                        form(action=`/usuario/seguir/${usuarioPerfil.id}` method="POST")
+                            if yaLoSigue
+                                button.btn.btn-secondary.btn-sm(type="submit") Dejar de seguir
+                            else
+                                button.btn.btn-primary.btn-sm(type="submit") Seguir
+                        button.btn.btn-primary.btn-sm(type="button" href="/Chat") Enviar Mensaje
 
         //Sistema de Pestañas
         ul.nav.nav-tabs.mb-4(id="perfilTabs" role="tablist")

@@ -67,13 +67,17 @@ html(lang="es")
                   span Subir Foto
               li.nav-item
                 a.nav-link.p-2.link-dark.fw-semibold(href="/perfil") 
-                  img.menu-icono.ms-2.me-3(src="images/usuario.png" alt="Icono")
+                  img.menu-icono.ms-2.me-3(src="/images/usuario.png" alt="Icono")
                   span Mi Perfil
               li.nav-item
                 a.nav-link.p-2.link-dark.fw-semibold(href="/notificaciones") 
-                  img.menu-icono.ms-2.me-3(src="images/notificaciones.png" alt="Icono")
+                  img.menu-icono.ms-2.me-3(src="/images/notificaciones.png" alt="Icono")
                   span Notificaciones
-              
+              li.nav-item
+                a.nav-link.p-2.link-dark.fw-semibold(href="/colecciones") 
+                  img.menu-icono.me-3(src="/images/guardar.png" alt="Icono" style="heigth: 28px; width: 28px; margin-left: 10px")
+                  span Colecciones
+
               if usuario.rol === 'validador'
                 li.nav-item
                   a.nav-link.p-2.link-danger.fw-semibold(href="/moderacion") 
