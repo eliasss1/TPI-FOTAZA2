@@ -50,10 +50,6 @@ app.get('/notificaciones', estaAutenticado, (req, res) => {
     res.render('notificaciones');
 });
 
-app.get('/colecciones', estaAutenticado, (req, res) => {
-    res.render('colecciones');
-});
-
 app.get('/chat', estaAutenticado, (req, res) => {
     res.render('chat');
 });
