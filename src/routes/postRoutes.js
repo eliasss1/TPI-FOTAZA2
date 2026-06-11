@@ -8,6 +8,9 @@ router.get('/perfil/:id', estaAutenticado, postController.mostrarPerfil);
 router.get('/nueva-publicacion', estaAutenticado, postController.mostrarFormulario);
 router.post('/publicaciones/crear', estaAutenticado, postController.crearPublicacion);
 
+router.get('/', postController.mostrarFeed);
+router.get('/buscar', postController.buscarPublicaciones);
+
 router.get('/perfil', estaAutenticado, postController.mostrarPerfil);
 router.post('/comentar/:id', estaAutenticado, postController.crearComentario);
 
@@ -18,5 +21,7 @@ router.post('/denuncia/:id', estaAutenticado, postController.crearDenuncia);
 
 router.get('/notificaciones', estaAutenticado, postController.mostrarNotificaciones);
 router.post('/notificaciones/leer/:id', estaAutenticado, postController.marcarNotificacionLeida);
+
+router.post('/valorar/:id', estaAutenticado, postController.valorarPublicacion);
 
 module.exports = router;

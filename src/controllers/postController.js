@@ -6,7 +6,9 @@ const {
     Comentario,
     Notificacion,
     Denuncia,
-    Coleccion
+    Coleccion,
+    Valoracion,
+    Etiqueta
 } = require("../models");
 const formidable = require("formidable");
 const fs = require("fs");
@@ -24,14 +26,24 @@ module.exports = {
                 include: [
                     { model: Usuario, as: "autor", attributes: ["username"] },
                     { model: Imagen, as: "imagenes" },
+                    { model: Etiqueta, as: "etiquetas" },
                     {
                         model: Comentario,
                         as: "comentarios",
                         include: [{ model: Usuario, as: "autor" }],
                     },
+
                 ],
                 order: [["createdAt", "DESC"]],
             });
+
+            for (let pub of publicaciones) {
+                const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
+                pub.dataValues.cantidadVotos = votos.length;
+                pub.dataValues.promedioValoracion = votos.length > 0 
+                    ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1) 
+                    : "0.0";
+            }
 
             res.render("index", { titulo: "Feed Fotaza", publicaciones });
         } catch (error) {
@@ -46,7 +58,9 @@ module.exports = {
     },
 
     crearPublicacion: (req, res) => {
-        if (!req.session.usuario) return res.redirect("/auth/login");
+        const formidable = require("formidable");
+        const path = require("path");
+        const fs = require("fs");
 
         const uploadDir = path.join(__dirname, "../public/images");
         if (!fs.existsSync(uploadDir)) {
@@ -61,19 +75,13 @@ module.exports = {
 
         form.parse(req, async (err, fields, files) => {
             if (err) return res.status(500).send("Error al procesar el formulario");
+            
             try {
-                const titulo = Array.isArray(fields.titulo)
-                    ? fields.titulo[0]
-                    : fields.titulo;
-                const descripcion = Array.isArray(fields.descripcion)
-                    ? fields.descripcion[0]
-                    : fields.descripcion;
-                const tipo_licencia = Array.isArray(fields.tipo_licencia)
-                    ? fields.tipo_licencia[0]
-                    : fields.tipo_licencia;
-                const marca_agua = Array.isArray(fields.marca_agua)
-                    ? fields.marca_agua[0]
-                    : fields.marca_agua;
+                const titulo = Array.isArray(fields.titulo) ? fields.titulo[0] : fields.titulo;
+                const descripcion = Array.isArray(fields.descripcion) ? fields.descripcion[0] : fields.descripcion;
+                const tipo_licencia = Array.isArray(fields.tipo_licencia) ? fields.tipo_licencia[0] : fields.tipo_licencia;
+                const marca_agua = Array.isArray(fields.marca_agua) ? fields.marca_agua[0] : fields.marca_agua;
+                const etiquetas = Array.isArray(fields.etiquetas) ? fields.etiquetas[0] : fields.etiquetas;
 
                 const nuevaPub = await Publicacion.create({
                     titulo,
@@ -82,8 +90,7 @@ module.exports = {
                 });
 
                 let imagenesSubidas = files.imagenes;
-                if (!Array.isArray(imagenesSubidas))
-                    imagenesSubidas = [imagenesSubidas];
+                if (!Array.isArray(imagenesSubidas)) imagenesSubidas = [imagenesSubidas];
 
                 for (let img of imagenesSubidas) {
                     if (img && img.newFilename) {
@@ -95,6 +102,19 @@ module.exports = {
                         });
                     }
                 }
+                if (etiquetas) {
+                    const listaEtiquetas = etiquetas.split(',')
+                        .map(e => e.trim().toLowerCase())
+                        .filter(e => e.length > 0);
+
+                    for (let nombre of listaEtiquetas) {
+                        const [etiquetaInstancia] = await Etiqueta.findOrCreate({
+                            where: { nombre }
+                        });
+                        await nuevaPub.addEtiqueta(etiquetaInstancia);
+                    }
+                }
+
                 res.redirect("/");
             } catch (error) {
                 console.error("Error DB:", error);
@@ -446,6 +466,77 @@ module.exports = {
         } catch (error) {
             console.error(error);
             res.redirect('/');
+        }
+    },
+
+    buscarPublicaciones: async (req, res) => {
+        try {
+            const query = req.query.query || '';
+            const publicaciones = await Publicacion.findAll({
+                where: {
+                    bajada: { [Op.not]: true },
+                    [Op.or]: [
+                        { titulo: { [Op.iLike]: `%${query}%` } },
+                        { descripcion: { [Op.iLike]: `%${query}%` } }
+                    ]
+                },
+                include: [
+                    { model: Usuario, as: "autor", attributes: ["username"] },
+                    { model: Imagen, as: "imagenes" },
+                    {
+                        model: Comentario,
+                        as: "comentarios",
+                        include: [{ model: Usuario, as: "autor" }],
+                    },
+                    { model: Etiqueta, as: "etiquetas" },
+                ],
+                order: [["createdAt", "DESC"]],
+            });
+
+            for (let pub of publicaciones) {
+                const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
+                pub.dataValues.cantidadVotos = votos.length;
+                pub.dataValues.promedioValoracion = votos.length > 0 
+                    ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1) 
+                    : "0.0";
+            }
+
+            res.render("index", { titulo: "Resultados de busqueda", publicaciones });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error interno");
+        }
+    },
+
+    
+    valorarPublicacion: async (req, res) => {
+        try {
+            const publicacion_id = req.params.id;
+            const usuario_id = req.session.usuario.id;
+            const { puntos } = req.body;
+
+            const pub = await Publicacion.findByPk(publicacion_id);
+            if (!pub || pub.usuario_id === usuario_id) {
+                return res.redirect('/');
+            }
+
+            const existe = await Valoracion.findOne({ where: { publicacion_id, usuario_id } });
+            if (existe) {
+                await existe.update({ puntos: parseInt(puntos) });
+            } else {
+                await Valoracion.create({ puntos: parseInt(puntos), usuario_id, publicacion_id });
+                await Notificacion.create({
+                    tipo_evento: "valoracion",
+                    mensaje: "Ha valorado tu publicacion.",
+                    usuario_id: pub.usuario_id,
+                    actor_id: usuario_id,
+                });
+            }
+
+            res.redirect(req.get("Referrer") || "/");
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error al procesar valoracion");
         }
     }
 

@@ -46,16 +46,9 @@ block content
                                             i.bi.bi-person-circle.me-1
                                             | @comunidad_fotaza
 
-                                    //Título, Like y Dislike
+                                    //Título
                                     div.d-flex.justify-content-between.align-items-center.mb-1
                                         h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
-                
-                                        if usuario
-                                            div.d-flex.gap-2
-                                                button.btn.btn-link.p-0.text-danger(title="Me gusta")
-                                                    i.bi.bi-heart-fill.fs-5
-                                                button.btn.btn-link.p-0.text-muted(title="No me gusta")
-                                                    i.bi.bi-heartbreak-fill.fs-5
 
                                     //Valoracion
                                     div.d-flex.align-items-center.gap-1.mb-2
@@ -64,8 +57,13 @@ block content
                                             span.fw-bold.text-dark= publicacion.promedioValoracion || "0.0"
                                         span.text-muted.small= `(${publicacion.cantidadVotos || 0} valoraciones)`
 
-                                    //Descripcion limpia
+                                    //Descripcion limpia y etiquetas debajo
                                     p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
+
+                                    if publicacion.etiquetas && publicacion.etiquetas.length > 0
+                                        .d-flex.flex-wrap.gap-1.mt-2
+                                            each tag in publicacion.etiquetas
+                                                span.badge.bg-secondary.small # #{tag.nombre}
 
                                     //Herramientas inferiores
                                     if usuario
@@ -80,8 +78,24 @@ block content
                                                 button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
                                                     img(src="/images/comentario.png" style="height: 20px; width: 20px")
 
-                                            button.btn.btn-outline-secondary.btn-sm.mt-1.border-0.position-relative(type="button")
-                                                img.pb-1(src="/images/estrella.png" style="height: 25px; width: 20px")        
+                                            // Menu para votar
+                                            if usuario && usuario.id !== publicacion.usuario_id
+                                                .dropdown.position-relative
+                                                    button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
+                                                        img(src="/images/estrella.png" style="height: 22px; width: 20px")
+                                                    form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
+                                                        p.small.text-center.mb-1.fw-bold Puntaje
+                                                        .d-flex.gap-1.justify-content-center
+                                                            select.form-select.form-select-sm(name="puntos" required)
+                                                                option(value="5") 5 ★
+                                                                option(value="4") 4 ★
+                                                                option(value="3") 3 ★
+                                                                option(value="2") 2 ★
+                                                                option(value="1") 1 ★
+                                                            button.btn.btn-sm.btn-warning.text-white(type="submit") Ok
+                                            else
+                                                span.p-1.text-muted
+                                                    | ---        
                                             
                                             
                                             if usuario.id !== publicacion.usuario_id
