@@ -46,10 +46,36 @@ module.exports = {
                     ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1) 
                     : "0.0";
             }
+            // Logica de Balance 
+            let destacadas = [];
+            let normales = [];
+
+            for (let pub of publicaciones) {
+                const promedio = parseFloat(pub.dataValues.promedioValoracion);
+                const cantidad = pub.dataValues.cantidadVotos;
+
+                if (promedio >= 4.0 && cantidad >=3) {
+                    destacadas.push(pub);
+                } else {
+                    normales.push(pub);
+                }
+            }
+
+            destacadas.sort((a, b) => b.dataValues.promedioValoracion - a.dataValues.promedioValoracion);
+
+            let feedBalanceado = [];
+            let indexDestacadas = 0;
+            let indexNormales = 0;
+
+            while (indexDestacadas < destacadas.length || indexNormales < normales.length){
+                if (indexDestacadas < destacadas.length) feedBalanceado.push(destacadas[indexDestacadas++]);
+                if (indexDestacadas < destacadas.length) feedBalanceado.push(destacadas[indexDestacadas++]);
+                if (indexNormales < normales.length) feedBalanceado.push(normales[indexNormales++]);
+            }
 
             res.render("index", 
             {   titulo: "Feed Fotaza", 
-                publicaciones,
+                publicaciones: feedBalanceado,
             });
         } catch (error) {
             console.error("Error al cargar el feed:", error);
@@ -623,8 +649,46 @@ module.exports = {
             console.error(error);
             res.status(500).send("Error al procesar valoracion");
         }
-    } 
+    }, 
 
+    registrarInteres: async (req, res) => {
+        try{
+            const publicacion_id = req.params.id;
+            const interesado_id = req.session.usuario.id;
+
+            const publicacion = await Publicacion.findByPk(publicacion_id);
+            if (!publicacion) return res.redirect('/');
+
+            await Notificacion.create({
+                tipo_evento: 'interes',
+                mensaje: `esta interesado en adquirir tu imagen titulada "${publicacion.titulo}"`,
+                usuario_id: publicacion.usuario_id,
+                actor_id: interesado_id
+            });
+            res.redirect(`/chat/${publicacion.usuario_id}`);
+        } catch (error) {
+            console.error("Error al registrar interes:", error);
+            res.status(500).send("Error interno");
+        }
+    },
+    
+    mostrarChatPrivado: async (req, res) => {
+        try {
+            const miId = req.session.usuario.id;
+            const conUsuarioId = req.params.conUsuarioId;
+
+            const otroUsuario = await Usuario.findByPk(conUsuarioId, { attributes: ['id', 'username' ]});
+            if (!otroUsuario) return res.redirect('/');
+
+            res.render('chat', {
+                titulo: `Chat con ${otroUsuario.username}`,
+                usuarioPerfil: otroUsuario
+            });
+        } catch (error) {
+            console.error("Error al cargar el chat:", error);
+            res.status(500).send("Error interno");
+        }
+    }
 };
 
 

@@ -28,4 +28,7 @@ router.get('/colecciones', estaAutenticado, postController.cargarColecciones)
 router.post('/colecciones/guardar/:id', estaAutenticado, postController.crearColeccionYGuardar);
 router.get('/colecciones/:id', estaAutenticado, postController.mostrarColeccion);
 
+router.post('/publicaciones/interes/:id', estaAutenticado, postController.registrarInteres);
+router.get('/chat/:conUsuarioId', estaAutenticado, postController.mostrarChatPrivado);
+
 module.exports = router;

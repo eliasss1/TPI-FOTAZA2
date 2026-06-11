@@ -35,12 +35,13 @@ block content
                     div.card.d-flex.flex-row.shadow-sm.p-2.gap-2.mb-2(class=notificacion.leida ? "bg-white" : "bg-light border-primary")
                         div.d-flex.flex-row.border-end.border-1.gap-3.p-2(style="width:800px")
                             div.border-end.border-1.pe-2
-                                
-                                strong.text-primary #{notificacion.actor.username} 
+                                if notificacion.tipo_evento === 'interes'
+                                    a.text-primary.fw-bold(href=`/chat/${notificacion.actor_id}`) #{notificacion.actor.username}
+                                else
+                                    strong.text-primary #{notificacion.actor.username} 
                             
                             p.card-text.text-center.text-muted.text-truncate #{notificacion.mensaje} 
                         div.border-end.border-1.d-flex.p-2(style="width:200px")
-                            
                             p.card-text.text-muted #{new Date(notificacion.createdAt).toLocaleDateString()}
 
                         if !notificacion.leida
