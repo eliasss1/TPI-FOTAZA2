@@ -17,26 +17,28 @@ const path = require("path");
 module.exports = {
     mostrarFeed: async (req, res) => {
         try {
-            const publicaciones = await Publicacion.findAll({
-                where: {
-                    bajada: {
-                        [Op.not]: true,
-                    },
+            const imagenInclude = {
+            model: Imagen,
+            as: "imagenes"
+        };
+        if (!req.session.usuario) {
+            imagenInclude.where = { tipo_licencia: 'sin_copyright' };
+            imagenInclude.required = true; 
+        }
+        const publicaciones = await Publicacion.findAll({
+            where: { bajada: { [Op.not]: true } },
+            include: [
+                { model: Usuario, as: "autor", attributes: ["username"] },
+                imagenInclude,
+                { model: Etiqueta, as: "etiquetas" },
+                {
+                    model: Comentario,
+                    as: "comentarios",
+                    include: [{ model: Usuario, as: "autor" }],
                 },
-                include: [
-                    { model: Usuario, as: "autor", attributes: ["username"] },
-                    { model: Imagen, as: "imagenes" },
-                    { model: Etiqueta, as: "etiquetas" },
-                    {
-                        model: Comentario,
-                        as: "comentarios",
-                        include: [{ model: Usuario, as: "autor" }],
-                    },
-
-                ],
-                order: [["createdAt", "DESC"]],
-            });
-
+            ],
+            order: [["createdAt", "DESC"]],
+        });
             for (let pub of publicaciones) {
                 const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
                 pub.dataValues.cantidadVotos = votos.length;
@@ -191,32 +193,25 @@ module.exports = {
 
     crearComentario: async (req, res) => {
         try {
-            const idPublicacion = req.params.id;
-            const idUsuario = req.session.usuario.id;
-            const textoContenido = req.body.comentario;
+        const publicacion_id = req.params.id;
+        const { comentario } = req.body; 
 
-            await Comentario.create({
-                texto: textoContenido,
-                usuario_id: idUsuario,
-                publicacion_id: idPublicacion,
-            });
-
-            const publicacion = await Publicacion.findByPk(idPublicacion);
-
-            if (publicacion && publicacion.usuario_id !== idUsuario) {
-                await Notificacion.create({
-                    tipo_evento: "comentario",
-                    mensaje: "Ha comentado en tu publicación.",
-                    usuario_id: publicacion.usuario_id,
-                    actor_id: idUsuario,
-                });
-            }
-
-            res.redirect(req.get("Referrer") || "/");
-        } catch (error) {
-            console.error("No se ha podido publicar el comentario", error);
-            res.status(500).send("Ha habido un error al cargar tu comentario");
+        const imagen = await Imagen.findOne({ where: { publicacion_id: publicacion_id } });
+        if (imagen && imagen.comentarios_abiertos === false) {
+            return res.status(403).send("Los comentarios están cerrados para esta publicación.");
         }
+
+        await Comentario.create({
+            texto: comentario,
+            usuario_id: req.session.usuario.id,
+            publicacion_id: publicacion_id
+        });
+
+        res.redirect('back');
+    } catch (error) {
+        console.error("Error al comentar:", error);
+        res.status(500).send("Error interno");
+    }
     },
 
     crearDenuncia: async (req, res) => {
@@ -304,7 +299,7 @@ module.exports = {
                 attributes: ["publicacion_id"],
                 where: { resuelta: false },
                 group: ["publicacion_id"],
-                having: sequelize.literal("COUNT(id) >= 3"),
+                having: sequelize.literal("COUNT(DISTINCT usuario_id) > 3"),
             });
 
             const idsPublicaciones = publicacionesComprometidas.map(
@@ -578,6 +573,26 @@ module.exports = {
         }
     },
 
+    cerrarComentarios: async (req, res) => {
+        try {
+            const publicacion_id = req.params.id;
+            const usuario_id = req.params.id;
+
+            const publicacion = await Publicacion.findByPk(publicacion_id);
+            if (!publicacion || publicacion.usuario_id !== usuario_id) {
+                return res.status(403).send("No autorizado para realizar esta accion.");
+            }
+            await Imagen.update(
+                { comentarios_abiertos: false},
+                {where: { publicacion_id}}
+            );
+            res.redirect('back');
+        } catch (error) {
+            console.error('Error al cerrar comentarios:', error);
+            res.status(500).send("Error interno");
+        }
+    },
+
     
     valorarPublicacion: async (req, res) => {
         try {
@@ -608,6 +623,8 @@ module.exports = {
             console.error(error);
             res.status(500).send("Error al procesar valoracion");
         }
-    }
+    } 
 
 };
+
+

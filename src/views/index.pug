@@ -17,8 +17,6 @@ block content
             if publicaciones && publicaciones.length > 0
                 each publicacion in publicaciones
                     
-                    
-                    if usuario || (publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'sin_copyright')
                         div.col
                             //El contenedor de la foto especifica
                             div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
