@@ -54,6 +54,10 @@ app.get('/colecciones', estaAutenticado, (req, res) => {
     res.render('colecciones');
 });
 
+app.get('/chat', estaAutenticado, (req, res) => {
+    res.render('chat');
+});
+
 const Port = process.env.Port || 3000;
 
 app.listen(Port, () => {
