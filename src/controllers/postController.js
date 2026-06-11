@@ -45,7 +45,10 @@ module.exports = {
                     : "0.0";
             }
 
-            res.render("index", { titulo: "Feed Fotaza", publicaciones });
+            res.render("index", 
+            {   titulo: "Feed Fotaza", 
+                publicaciones,
+            });
         } catch (error) {
             console.error("Error al cargar el feed:", error);
             res.status(500).send("Error interno");

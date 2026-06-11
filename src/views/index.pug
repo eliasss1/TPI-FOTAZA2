@@ -54,8 +54,8 @@ block content
                                     div.d-flex.align-items-center.gap-1.mb-2
                                         span.text-warning.small
                                             i.bi.bi-star-fill.me-1
-                                            span.fw-bold.text-dark= publicacion.promedioValoracion || "0.0"
-                                        span.text-muted.small= `(${publicacion.cantidadVotos || 0} valoraciones)`
+                                            span.fw-bold.text-dark= publicacion.dataValues.promedioValoracion || "0.0"
+                                        span.text-muted.small= `(${publicacion.dataValues.cantidadVotos || 0} valoraciones)`
 
                                     //Descripcion limpia y etiquetas debajo
                                     p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
