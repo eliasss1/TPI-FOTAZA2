@@ -472,6 +472,25 @@ module.exports = {
         }
     },
 
+    cargarColecciones: async (req, res) => {
+        try {
+            const usuarioID = req.session.usuario.id;
+            const colecciones = await Coleccion.findAll({
+                where: {
+                    usuario_id: usuarioID,
+                },
+                include: [
+                    {model: publicacion, as: "publicaciones"},
+                ]
+            });
+            res.render("colecciones", { titulo: "Colecciones", colecciones});
+            
+        }catch(error){
+            console.error(error)
+            res.status(500).send("Error interno");
+        }
+    },
+
     buscarPublicaciones: async (req, res) => {
         try {
             const query = req.query.query || '';

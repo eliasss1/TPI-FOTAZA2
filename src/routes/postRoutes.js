@@ -24,4 +24,7 @@ router.post('/notificaciones/leer/:id', estaAutenticado, postController.marcarNo
 
 router.post('/valorar/:id', estaAutenticado, postController.valorarPublicacion);
 
+router.get('colecciones', estaAutenticado, postController.cargarColecciones);
+router.post('/colecciones/guardar/:id', estaAutenticado, postController.crearColeccionYGuardar);
+
 module.exports = router;
