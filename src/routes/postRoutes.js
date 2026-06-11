@@ -31,4 +31,7 @@ router.get('/colecciones/:id', estaAutenticado, postController.mostrarColeccion)
 router.post('/publicaciones/interes/:id', estaAutenticado, postController.registrarInteres);
 router.get('/chat/:conUsuarioId', estaAutenticado, postController.mostrarChatPrivado);
 
+router.post('/perfil/:id/seguir', estaAutenticado, postController.seguirUsuario);
+router.get('/siguiendo', estaAutenticado, postController.feedSiguiendo);
+
 module.exports = router;

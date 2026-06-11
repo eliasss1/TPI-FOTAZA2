@@ -33,12 +33,12 @@ block content
                         | Nueva Publicación
                 else
                     div.d-flex.gap-2.justify-content-end
-                        form(action=`/usuario/seguir/${usuarioPerfil.id}` method="POST")
+                        form(action=`/perfil/${usuarioPerfil.id}/seguir` method="POST" style="margin: 0;")
                             if yaLoSigue
-                                button.btn.btn-secondary.btn-sm(type="submit") Dejar de seguir
+                                button.btn.btn-outline-secondary.btn-sm(type="submit") Dejar de seguir
                             else
                                 button.btn.btn-primary.btn-sm(type="submit") Seguir
-                        button.btn.btn-primary.btn-sm(type="button" href="/Chat") Enviar Mensaje
+                        a.btn.btn-primary.btn-sm(href=`/chat/${usuarioPerfil.id}`) Enviar Mensaje
 
         //Sistema de Pestañas
         ul.nav.nav-tabs.mb-4(id="perfilTabs" role="tablist")
@@ -86,8 +86,8 @@ block content
                                         div.d-flex.align-items-center.gap-1.mb-2
                                             span.text-warning.small
                                                 i.bi.bi-star-fill.me-1
-                                                span.fw-bold.text-dark= publicacion.promedioValoracion
-                                            span.text-muted.small= `(${publicacion.cantidadVotos} votos)`
+                                                span.fw-bold.text-dark= publicacion.dataValues.promedioValoracion || "0.0"
+                                            span.text-muted.small= `(${publicacion.dataValues.cantidadVotos || 0} votos)`
                                         //La descripcion
                                         p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
                                         //Los botones interactivos

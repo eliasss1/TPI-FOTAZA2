@@ -156,8 +156,11 @@ module.exports = {
 
     mostrarPerfil: async (req, res) => {
         try {
-            const usuarioId = req.params.id ? req.params.id : req.session.usuario.id;
-            const esPropioPerfil = usuarioId == req.session.usuario.id;
+            const usuarioId = req.params.id ? parseInt(req.params.id) : req.session.usuario.id;
+            const esPropioPerfil = usuarioId === req.session.usuario.id;
+
+            const { Usuario, Publicacion, Imagen, Comentario, Valoracion } = require("../models");
+            const { Op } = require("sequelize");
 
             const usuarioPerfil = await Usuario.findByPk(usuarioId, {
                 include: [
@@ -171,36 +174,39 @@ module.exports = {
             }
 
             const publicaciones = await Publicacion.findAll({
-                where: { usuario_id: usuarioId },
+                where: {
+                    usuario_id: usuarioId,
+                    bajada: { [Op.not]: true}
+                },
                 include: [
-                    { model: Imagen, as: "imagenes" },
+                    { model: Imagen, as: "imagenes"},
                     {
                         model: Comentario,
                         as: "comentarios",
-                        include: [{ model: Usuario, as: "autor" }],
+                        include: [{ model: Usuario, as: "autor"}],
                     },
-                    { model: Usuario, as: "autor" },
+                    { model: Usuario, as: "autor"},
                 ],
                 order: [["createdAt", "DESC"]],
             });
 
-            //Le cargo los seguidores
-            const cantidadSeguidores = usuarioPerfil.Seguidor
-                ? usuarioPerfil.Seguidor.length
-                : 0;
-            const cantidadSeguidos = usuarioPerfil.Seguidos
-                ? usuarioPerfil.Seguidos.length
-                : 0;
-
-            //Verifico si ya lo sigue
-            let yaLoSigue = false;
-            if (!esPropioPerfil) {
-                yaLoSigue =
-                    usuarioPerfil.Seguidor?.some(
-                        (seguidor) => seguidor.id === req.session.usuario.id,
-                    ) || false;
+            for (let pub of publicaciones) {
+                const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id}});
+                pub.dataValues.cantidadVotos = votos.length;
+                pub.dataValues.promedioValoracion = votos.length > 0
+                    ? (votos.reduce((acc, v) => v.puntos, 0) / votos.length).toFixed(1)
+                    : "0.0";
             }
 
+            const cantidadSeguidores = usuarioPerfil.Seguidor ? usuarioPerfil.Seguidor.length : 0;
+            const cantidadSeguidos = usuarioPerfil.Seguidos ? usuarioPerfil.Seguidos.length : 0;
+
+            let yaLoSigue = false;
+            if (!esPropioPerfil && req.session.usuario) {
+                yaLoSigue = usuarioPerfil.Seguidor?.some(
+                    (seguidor) => seguidor.id == req.session.usuario.id,
+                ) || false;
+            }
             res.render("perfil", {
                 titulo: `Perfil de ${usuarioPerfil.username}`,
                 publicaciones,
@@ -716,6 +722,96 @@ module.exports = {
             });
         } catch (error) {
             console.error("Error al cargar el chat:", error);
+            res.status(500).send("Error interno");
+        }
+    },
+
+    seguirUsuario: async (req, res) => {
+        try {
+            const seguidor_id = req.session.usuario.id;
+            const seguido_id = parseInt(req.params.id);
+
+            if (seguidor_id === seguido_id) {
+                return res.status(400).send("No puedes seguirte a ti mismo.");
+            }
+
+            const usuarioLogueado = await Usuario.findByPk(seguidor_id);
+            const usuarioASeguir = await Usuario.findByPk(seguido_id);
+
+            if (!usuarioLogueado || !usuarioASeguir) res.redirect('/');
+
+            const yaLoSigue = await usuarioASeguir.hasSeguidos(usuarioASeguir);
+
+            if (yaLoSigue) {
+                await usuarioLogueado.removeSeguidos(usuarioASeguir);
+            } else {
+                await usuarioLogueado.addSeguidos(usuarioASeguir);
+
+                await Notificacion.create({
+                    tipo_evento: 'seguimiento',
+                    mensaje: 'Ha comenzado a seguirte.',
+                    usuario_id: seguido_id,
+                    actor_id: seguidor_id
+                });
+            }
+            res.redirect(`/perfil/${seguido_id}`);
+        } catch (error) {
+            console.error("Error al seguir usuario:", error);
+            res.status(500).send("Error interno");
+        }
+    },
+
+    feedSiguiendo: async (req, res) => {
+        try {
+            const miId = req.session.usuario.id;
+            const { Usuario, Publicacion, Imagen, Etiqueta, Comentario, Valoracion } = require("../models");
+            const { Op } = require("sequelize");
+            
+            const miUsuario = await Usuario.findByPk(miId, {
+                include: [{ model: Usuario, as: 'Seguidos', attributes: ['id'] }]
+            });
+            const idsSeguidos = miUsuario.Seguidos ? miUsuario.Seguidos.map(u => u.id) : [];
+
+            if (idsSeguidos.length === 0) {
+                return res.render("index", { 
+                    titulo: "Publicaciones de quienes sigues", 
+                    publicaciones: [] 
+                });
+            }
+
+            const publicaciones = await Publicacion.findAll({
+                where: {
+                    usuario_id: idsSeguidos,
+                    bajada: { [Op.not]: true }
+                },
+                include: [
+                    { model: Usuario, as: "autor", attributes: ["username"] },
+                    { model: Imagen, as: "imagenes", required: true },
+                    { model: Etiqueta, as: "etiquetas" },
+                    { 
+                        model: Comentario, 
+                        as: "comentarios", 
+                        include: [{ model: Usuario, as: "autor" }] 
+                    },
+                ],
+                order: [["createdAt", "DESC"]]
+            });
+
+            for (let pub of publicaciones) {
+                const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
+                pub.dataValues.cantidadVotos = votos.length;
+                pub.dataValues.promedioValoracion = votos.length > 0 
+                    ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1) 
+                    : "0.0";
+            }
+
+            res.render("index", { 
+                titulo: "Publicaciones de quienes sigues", 
+                publicaciones 
+            });
+
+        } catch (error) {
+            console.error("Error al cargar feed de seguidos:", error);
             res.status(500).send("Error interno");
         }
     }
