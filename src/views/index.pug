@@ -126,8 +126,12 @@ block content
                                                                 .row
                                                                     strong.col-md-2 #{comentario.autor.username}
                                                                     p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
-                                                                    button.col-md-1.ms-5.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
-                                                                        img.pb-1(src="/images/me-gusta.png" style="height: 15px; width: 15px")
+                                                                    button.col-md-1.btn.btn-outline-danger.border-0.btn-sm.position-relative(type="button")
+                                                                        img.pb-1(src="/images/bandera.png" style="height: 15px; width: 15px")
+                                                                    if publicacion.usuario_id == usuario.id
+                                                                        
+                                                                        button.col-md-1.ms-1.btn.btn-outline-danger.btn-sm.position-relative(type="button")
+                                                                            i.bi.bi-trash-fill
 
                                                 div.border-top.border-1.p-1
                                                     form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
