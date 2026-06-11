@@ -7,9 +7,23 @@ block content
         //Barra de busqueda
         div.row.mb-4.justify-content-center
             div.col-md-8
-                form.d-flex.gap-2(action="/buscar" method="GET")
-                    input.form-control.border-2(type="text" name="query" placeholder="Buscar fotos, autores o etiquetas...")
-                    button.btn.btn-primary(type="submit") Buscar
+                form.d-flex.flex-column.gap-2.bg-light.p-3.rounded.border.border-secondary-subtle(action="/buscar" method="GET")
+                    div.d-flex.gap-2
+                        input.form-control.border-2(type="text" name="query" placeholder="Buscar por titulo o descripcion...")
+                        button.btn.btn-primary(type="submit") Buscar
+                    
+                    // Filtros combinables
+                    div.d-flex.gap-3.mt-2
+                        select.form-select.form-select-sm(name="licencia")
+                            option(value="") Todas las licencias
+                            option(value="sin_copyright") Sin Copyright
+                            option(value="con_copyright") Con Copyright
+                        
+                        select.form-select.form-select-sm(name="orden")
+                            option(value="recientes") Mas recientes primero
+                            option(value="antiguas") Mas antiguas primero
+                        
+                        input.form-control.form-control-sm(type="text" name="etiqueta" placeholder="Filtrar por etiqueta (ej: paisaje)")
 
         //El contenedor de fotos
         div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start.overflow-auto

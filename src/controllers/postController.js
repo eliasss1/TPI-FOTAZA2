@@ -563,25 +563,55 @@ module.exports = {
     buscarPublicaciones: async (req, res) => {
         try {
             const query = req.query.query || '';
+            const licencia = req.query.licencia || '';
+            const orden = req.query.orden || 'recientes';
+            const etiqueta = req.query.etiqueta || '';
+
+            let wherePublicacion = {
+                bajada: { [Op.not]: true }
+            };
+
+            if (query) {
+                wherePublicacion[Op.or] = [
+                    { titulo: { [Op.iLike]: `%${query}%` } },
+                    { descripcion: { [Op.iLike]: `%${query}%` } }
+                ];
+            }
+            let whereImagen = {};
+            if (!req.session.usuario) {
+                whereImagen.tipo_licencia = 'sin_copyright'; 
+            } else if (licencia) {
+                whereImagen.tipo_licencia = licencia; 
+            }
+            let includeEtiquetas = { model: Etiqueta, as: "etiquetas" };
+            if (etiqueta) {
+                includeEtiquetas.where = { nombre: { [Op.iLike]: `%${etiqueta.trim()}%` } };
+                includeEtiquetas.required = true;
+            }
+
+            let orderRules = [["createdAt", "DESC"]];
+            if (orden === "antiguas") {
+                orderRules = [["createdAt", "ASC"]];
+            }
+
             const publicaciones = await Publicacion.findAll({
-                where: {
-                    bajada: { [Op.not]: true },
-                    [Op.or]: [
-                        { titulo: { [Op.iLike]: `%${query}%` } },
-                        { descripcion: { [Op.iLike]: `%${query}%` } }
-                    ]
-                },
+                where: wherePublicacion,
                 include: [
                     { model: Usuario, as: "autor", attributes: ["username"] },
-                    { model: Imagen, as: "imagenes" },
+                    { 
+                        model: Imagen, 
+                        as: "imagenes",
+                        where: Object.keys(whereImagen).length > 0 ? whereImagen : undefined,
+                        required: Object.keys(whereImagen).length > 0
+                    },
                     {
                         model: Comentario,
                         as: "comentarios",
                         include: [{ model: Usuario, as: "autor" }],
                     },
-                    { model: Etiqueta, as: "etiquetas" },
+                    includeEtiquetas
                 ],
-                order: [["createdAt", "DESC"]],
+                order: orderRules,
             });
 
             for (let pub of publicaciones) {
