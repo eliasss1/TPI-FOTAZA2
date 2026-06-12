@@ -39,9 +39,11 @@ block content
                                     a.text-primary.fw-bold(href=`/chat/${notificacion.actor_id}`) #{notificacion.actor.username}
                                 else if notificacion.tipo_evento == 'seguimiento'
                                     a.text-primary.fw-bold(href=`/perfil/${notificacion.actor_id}`) #{notificacion.actor.username}
-                                else if notificacion.tipo_evento == 'comentario' || notificacion.tipo_evento == 'valoracion' || notificacion.tipo_evento == 'denuncia_comentario'
+                                else if notificacion.tipo_evento == 'comentario' || notificacion.tipo_evento == 'valoracion' || notificacion.tipo_evento == 'denuncia_comentario' || notificacion.tipo_evento == 'sancion' || notificacion.tipo_evento == 'advertencia'
                                     a.text-primary.fw-bold(href=`/publicacion/${notificacion.publicacion_id}`) #{notificacion.actor.username}
-                                else
+                                else if notificacion.tipo_evento == 'moderacion' 
+                                    strong.text-primary #{notificacion.actor.username}
+                                else 
                                     strong.text-primary #{notificacion.actor.username}
                             
                             p.card-text.text-center.text-muted.text-truncate #{notificacion.mensaje} 
