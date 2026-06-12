@@ -40,7 +40,7 @@ module.exports = {
                 order: [['createdAt', 'ASC']]
             });
 
-            res.render('chat', {
+            res.render('Chat', {
                 titulo: `Chat con ${receptor.username}`,
                 receptor,
                 chat,

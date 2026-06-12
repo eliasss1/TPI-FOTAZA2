@@ -264,7 +264,7 @@ module.exports = {
                     mensaje: "Ha valorado tu publicacion.",
                     usuario_id: pub.usuario_id,
                     actor_id: usuario_id,
-                    publicacion_id: pub.usuario_id
+                    publicacion_id: publicacion_id
                 });
             }
 
