@@ -61,13 +61,12 @@ module.exports = {
 
             const { Denuncia, Publicacion } = require("../models");
 
-            // --- CÓDIGO NUEVO: Verificar que no sea el dueño ---
+            
             const publicacion = await Publicacion.findByPk(publicacionId);
             if (!publicacion || publicacion.usuario_id === usuarioId) {
                 console.log("No puedes denunciar tu propia publicación.");
                 return res.redirect("/");
             }
-            // ---------------------------------------------------
 
             const denunciaExistente = await Denuncia.findOne({
                 where: { publicacion_id: publicacionId, usuario_id: usuarioId },
@@ -125,6 +124,42 @@ module.exports = {
         }
     },
 
+    guardarEnMultiples: async (req, res) => {
+        try {
+            const publicacion_id = req.params.id;
+            let coleccionesIds = req.body.coleccionesOpciones;
+
+            if (!coleccionesIds) {
+                return res.redirect('/');
+            }
+
+            
+            if (!Array.isArray(coleccionesIds)) {
+                coleccionesIds = [coleccionesIds];
+            }
+
+            const { Publicacion, Coleccion } = require('../models');
+            const publicacion = await Publicacion.findByPk(publicacion_id);
+
+            if (!publicacion) return res.redirect('/');
+
+            const colecciones = await Coleccion.findAll({
+                where: {
+                    id: coleccionesIds,
+                    usuario_id: req.session.usuario.id
+                }
+            });
+
+            for (let col of colecciones) {
+                await col.addPublicacione(publicacion);
+            }
+
+            res.redirect('/');
+        } catch (error) {
+            console.error("Error al guardar en multiples colecciones:", error);
+            res.status(500).send("Error interno");
+        }
+    },
 
     buscarPublicaciones: async (req, res) => {
         try {

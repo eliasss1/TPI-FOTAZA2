@@ -194,28 +194,27 @@ block content
                                                 h5.modal-title Guardar en Coleccion
                                                 button.btn-close(data-bs-dismiss="modal")
                                             div.modal-body
-                                                form(action=`/colecciones/guardar/${publicacion.id}` method="POST")
+
+                                                form(action=`/colecciones/guardarYCrear/${publicacion.id}` method="POST")
                                                     div.mb-3
                                                         label.form-label.text-muted.small Nombre de la Coleccion
-                                                        input.form-control(type="text" name="nombreColeccion" list="listaColecciones" placeholder="Nueva colección o elige una...")
-                                                        datalist#listaColecciones
+                                                        input.form-control(type="text" name="nombreColeccion" list=`listaColecciones-${publicacion.id}` placeholder="Nueva coleccion..." required)
+                                                        datalist(id=`listaColecciones-${publicacion.id}`)
                                                             if misColecciones
                                                                 each col in misColecciones
                                                                     option(value=col.nombre)
-                                                    button.btn.btn-primary.w-100(type="submit") Guardar Publicacion
-                                                .dropdown.position-relative
-                                                    button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
-                                                        img(src="/images/estrella.png" style="height: 22px; width: 20px")
-                                                    form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
-                                                        p.small.text-center.mb-1.fw-bold Puntaje
-                                                        .d-flex.gap-1.justify-content-center
-                                                            select.form-select.form-select-sm(name="puntos" required)
-                                                                option(value="5") 5 ★
-                                                                option(value="4") 4 ★
-                                                                option(value="3") 3 ★
-                                                                option(value="2") 2 ★
-                                                                option(value="1") 1 ★
-                                                            button.btn.btn-sm.btn-warning.text-white(type="submit") Ok                            
+                                                    button.btn.btn-primary.w-100.mb-4(type="submit") Guardar (Individual)
+                                                
+                                                hr.text-muted
+
+                                                if misColecciones && misColecciones.length > 0
+                                                    form(action=`/colecciones/guardarMultiples/${publicacion.id}` method="POST")
+                                                        div.mb-3
+                                                            label.form-label.text-muted.small Guardar en multiples (Ctrl + Clic)
+                                                            select.form-select(name="coleccionesOpciones" multiple required style="height: 100px;")
+                                                                each coleccion in misColecciones
+                                                                    option(value=coleccion.id)= coleccion.nombre
+                                                        button.btn.btn-outline-primary.w-100(type="submit") Guardar en Seleccionadas                           
             else
                 div.col-12.text-center.py-5.my-auto
                     i.bi.bi-image-fill.text-secondary.opacity-25(style="font-size: 5rem;")

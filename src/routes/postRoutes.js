@@ -39,8 +39,9 @@ router.get('/publicacion/:id', estaAutenticado, notiController.mostrarPublicacio
 
 //RUTAS DE COLECCIONES
 router.get('/colecciones', estaAutenticado, coleccionesController.cargarColecciones)
-router.post('/colecciones/guardar/:id', estaAutenticado, postController.crearColeccionYGuardar);
+router.post('/colecciones/guardarYCrear/:id', estaAutenticado, postController.crearColeccionYGuardar);
 router.get('/colecciones/:id', estaAutenticado, coleccionesController.mostrarColeccion);
+router.post('/colecciones/guardarMultiples/:id', estaAutenticado, postController.guardarEnMultiples);
 
 //RUTAS CHAT
 router.get('/chat/:conUsuarioId', estaAutenticado, chatController.mostrarChatPrivado);
