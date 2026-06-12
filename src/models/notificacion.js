@@ -9,7 +9,7 @@ const Notificacion = sequelize.define('Notificacion', {
     },
     tipo_evento: {
         // Agregamos 'denuncia_comentario' a la lista
-        type: DataTypes.ENUM('comentario', 'valoracion', 'interes', 'seguimiento', 'denuncia_comentario'),
+        type: DataTypes.ENUM('comentario', 'valoracion', 'interes', 'seguimiento', 'denuncia_comentario', 'moderacion', 'sancion', 'advertencia'),
         allowNull: false
     },
     mensaje: {
