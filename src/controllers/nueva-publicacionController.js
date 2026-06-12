@@ -41,31 +41,34 @@ module.exports = {
             if (err) return res.status(500).send("Error al procesar el formulario");
             
             try {
-                const titulo = Array.isArray(fields.titulo) ? fields.titulo[0] : fields.titulo;
-                const descripcion = Array.isArray(fields.descripcion) ? fields.descripcion[0] : fields.descripcion;
-                const tipo_licencia = Array.isArray(fields.tipo_licencia) ? fields.tipo_licencia[0] : fields.tipo_licencia;
-                const marca_agua = Array.isArray(fields.marca_agua) ? fields.marca_agua[0] : fields.marca_agua;
-                const etiquetas = Array.isArray(fields.etiquetas) ? fields.etiquetas[0] : fields.etiquetas;
+                    const titulo = Array.isArray(fields.titulo) ? fields.titulo[0] : fields.titulo;
+                    const descripcion = Array.isArray(fields.descripcion) ? fields.descripcion[0] : fields.descripcion;
+                    const tipo_licencia = Array.isArray(fields.tipo_licencia) ? fields.tipo_licencia[0] : fields.tipo_licencia;
+                    const marca_agua = Array.isArray(fields.marca_agua) ? fields.marca_agua[0] : fields.marca_agua;
+                    const etiquetas = Array.isArray(fields.etiquetas) ? fields.etiquetas[0] : fields.etiquetas;
+                    
+                    const comentarios_abiertos = fields.comentarios ? true : false;
 
-                const nuevaPub = await Publicacion.create({
-                    titulo,
-                    descripcion,
-                    usuario_id: req.session.usuario.id,
-                });
+                    const nuevaPub = await Publicacion.create({
+                        titulo,
+                        descripcion,
+                        usuario_id: req.session.usuario.id,
+                    });
 
-                let imagenesSubidas = files.imagenes;
-                if (!Array.isArray(imagenesSubidas)) imagenesSubidas = [imagenesSubidas];
+                    let imagenesSubidas = files.imagenes;
+                    if (!Array.isArray(imagenesSubidas)) imagenesSubidas = [imagenesSubidas];
 
-                for (let img of imagenesSubidas) {
-                    if (img && img.newFilename) {
-                        await Imagen.create({
-                            url_path: "/images/" + img.newFilename,
-                            tipo_licencia: tipo_licencia || "con_copyright",
-                            marca_agua: marca_agua || null,
-                            publicacion_id: nuevaPub.id,
-                        });
+                    for (let img of imagenesSubidas) {
+                        if (img && img.newFilename) {
+                            await Imagen.create({
+                                url_path: "/images/" + img.newFilename,
+                                tipo_licencia: tipo_licencia || "con_copyright",
+                                marca_agua: marca_agua || null,
+                                comentarios_abiertos: comentarios_abiertos, // NUEVO: Guardamos la decisión del usuario
+                                publicacion_id: nuevaPub.id,
+                            });
+                        }
                     }
-                }
                 if (etiquetas) {
                     const listaEtiquetas = etiquetas.split(',')
                         .map(e => e.trim().toLowerCase())
