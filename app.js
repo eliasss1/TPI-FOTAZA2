@@ -27,6 +27,7 @@ const dbPool = new Pool({
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
+    ssl: { rejectUnauthorized: false }
 });
 
 app.use(session({
@@ -52,15 +53,10 @@ app.use(express.static(path.join(__dirname, 'src','public')));
 
 // RUTAS
 app.use('/', postRoutes);
-
-// Rutas de autenticación
 app.use('/auth', authRoutes);
 
 // MIDDLEWARES RUTAS SUELTAS
 const {estaAutenticado, esModerador} = require('./src/middlewares/authMiddleware');
-
-// Iniciar el servidor
-const Port = process.env.PORT || 3000; 
 
 sequelize.sync({ alter: true })
     .then(() => {
@@ -70,8 +66,11 @@ sequelize.sync({ alter: true })
         console.error('Error al sincronizar las tablas:', error);
     });
 
-app.listen(Port, () => {
-    console.log(`Servidor iniciado en el puerto ${Port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    const Port = process.env.PORT || 3000; 
+    app.listen(Port, () => {
+        console.log(`Servidor iniciado en el puerto ${Port}`);
+    });
+}
 
 module.exports = app;
