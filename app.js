@@ -44,6 +44,13 @@ const {estaAutenticado, esModerador} = require('./src/middlewares/authMiddleware
 
 
 const Port = process.env.Port || 3000;
+sequelize.sync({ alter: true })
+    .then(() => {
+    console.log('Tablas sincronizadas con éxito');
+    })
+    .catch((error) => {
+    console.error('Error al sincronizar las tablas:', error);
+    });
 
 app.listen(Port, () => {
     console.log(`Servidor iniciado en el puerto ${Port}`);
