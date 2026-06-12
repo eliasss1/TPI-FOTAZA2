@@ -197,7 +197,11 @@ block content
                                                 form(action=`/colecciones/guardar/${publicacion.id}` method="POST")
                                                     div.mb-3
                                                         label.form-label.text-muted.small Nombre de la Coleccion
-                                                        input.form-control.bg-light.border-0(type="text" name="nombreColeccion" placeholder="Ej: Paisajes, Inspiracion..." required)
+                                                        input.form-control(type="text" name="nombreColeccion" list="listaColecciones" placeholder="Nueva colección o elige una...")
+                                                        datalist#listaColecciones
+                                                            if misColecciones
+                                                                each col in misColecciones
+                                                                    option(value=col.nombre)
                                                     button.btn.btn-primary.w-100(type="submit") Guardar Publicacion                            
             else
                 div.col-12.text-center.py-5.my-auto

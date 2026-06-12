@@ -14,44 +14,45 @@ const formidable = require("formidable");
 const fs = require("fs");
 const path = require("path");
 
+
 module.exports = {
-    
+
     crearComentario: async (req, res) => {
-    try {
-        const publicacion_id = req.params.id;
-        const { comentario } = req.body; 
+        try {
+            const publicacion_id = req.params.id;
+            const { comentario } = req.body;
 
-        const imagen = await Imagen.findOne({ where: { publicacion_id: publicacion_id } });
-        if (imagen && imagen.comentarios_abiertos === false) {
-            return res.status(403).send("Los comentarios están cerrados para esta publicación.");
-        }
+            const imagen = await Imagen.findOne({ where: { publicacion_id: publicacion_id } });
+            if (imagen && imagen.comentarios_abiertos === false) {
+                return res.status(403).send("Los comentarios están cerrados para esta publicación.");
+            }
 
-        await Comentario.create({
-            texto: comentario,
-            usuario_id: req.session.usuario.id,
-            publicacion_id: publicacion_id
-        });
-
-
-        const publicacion = await Publicacion.findByPk(publicacion_id);
-                
-        if (publicacion && publicacion.usuario_id !== req.session.usuario.id) {
-            await Notificacion.create({
-                tipo_evento: 'comentario',
-                mensaje: 'Ha comentado tu publicación.',
-                usuario_id: publicacion.usuario_id,
-                actor_id: req.session.usuario.id    
+            await Comentario.create({
+                texto: comentario,
+                usuario_id: req.session.usuario.id,
+                publicacion_id: publicacion_id
             });
+
+
+            const publicacion = await Publicacion.findByPk(publicacion_id);
+
+            if (publicacion && publicacion.usuario_id !== req.session.usuario.id) {
+                await Notificacion.create({
+                    tipo_evento: 'comentario',
+                    mensaje: 'Ha comentado tu publicación.',
+                    usuario_id: publicacion.usuario_id,
+                    actor_id: req.session.usuario.id
+                });
+            }
+
+            res.redirect(req.get('Referrer') || '/');
+        } catch (error) {
+            console.error("Error al comentar:", error);
+            res.status(500).send("Error interno");
         }
+    },
 
-        res.redirect('back'); 
-    } catch (error) {
-        console.error("Error al comentar:", error);
-        res.status(500).send("Error interno");
-    }
-},
-
-crearDenuncia: async (req, res) => {
+    crearDenuncia: async (req, res) => {
         try {
             const publicacionId = req.params.id;
             const usuarioId = req.session.usuario.id;
@@ -94,25 +95,25 @@ crearDenuncia: async (req, res) => {
             res.status(500).send("Error interno al procesar la denuncia");
         }
     },
-    
+
     crearColeccionYGuardar: async (req, res) => {
 
         try {
             const idPublicacion = req.params.id;
-            const nombreColeccion = req.body.nombreColeccion; 
-            const idUsuario = req.session.usuario.id; 
+            const nombreColeccion = req.body.nombreColeccion;
+            const idUsuario = req.session.usuario.id;
 
-            
+
             const [coleccion] = await Coleccion.findOrCreate({
                 where: { nombre: nombreColeccion, usuario_id: idUsuario }
             });
 
-            
+
             const publicacion = await Publicacion.findByPk(idPublicacion);
 
-            
+
             if (publicacion) {
-                await coleccion.addPublicacione(publicacion); 
+                await coleccion.addPublicacione(publicacion);
             }
 
             res.redirect('/');
@@ -143,9 +144,9 @@ crearDenuncia: async (req, res) => {
             }
             let whereImagen = {};
             if (!req.session.usuario) {
-                whereImagen.tipo_licencia = 'sin_copyright'; 
+                whereImagen.tipo_licencia = 'sin_copyright';
             } else if (licencia) {
-                whereImagen.tipo_licencia = licencia; 
+                whereImagen.tipo_licencia = licencia;
             }
             let includeEtiquetas = { model: Etiqueta, as: "etiquetas" };
             if (etiqueta) {
@@ -162,8 +163,8 @@ crearDenuncia: async (req, res) => {
                 where: wherePublicacion,
                 include: [
                     { model: Usuario, as: "autor", attributes: ["username"] },
-                    { 
-                        model: Imagen, 
+                    {
+                        model: Imagen,
                         as: "imagenes",
                         where: Object.keys(whereImagen).length > 0 ? whereImagen : undefined,
                         required: Object.keys(whereImagen).length > 0
@@ -181,21 +182,31 @@ crearDenuncia: async (req, res) => {
             for (let pub of publicaciones) {
                 const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
                 pub.dataValues.cantidadVotos = votos.length;
-                pub.dataValues.promedioValoracion = votos.length > 0 
-                    ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1) 
+                pub.dataValues.promedioValoracion = votos.length > 0
+                    ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1)
                     : "0.0";
             }
 
-            res.render("index", { titulo: "Resultados de busqueda", publicaciones });
+            let misColecciones = [];
+            if (req.session.usuario) {
+                
+                misColecciones = await Coleccion.findAll({
+                    where: { usuario_id: req.session.usuario.id }
+                });
+            }
+
+            
+            res.render("index", {
+                titulo: "Resultados de busqueda",
+                publicaciones,
+                misColecciones 
+            });
         } catch (error) {
             console.error(error);
             res.status(500).send("Error interno");
         }
     },
 
-    
-
-    
     valorarPublicacion: async (req, res) => {
         try {
             const publicacion_id = req.params.id;
@@ -225,10 +236,10 @@ crearDenuncia: async (req, res) => {
             console.error(error);
             res.status(500).send("Error al procesar valoracion");
         }
-    }, 
+    },
 
     registrarInteres: async (req, res) => {
-        try{
+        try {
             const publicacion_id = req.params.id;
             const interesado_id = req.session.usuario.id;
 
@@ -247,9 +258,9 @@ crearDenuncia: async (req, res) => {
             res.status(500).send("Error interno");
         }
     },
-    
 
-    
+
+
 };
 
 

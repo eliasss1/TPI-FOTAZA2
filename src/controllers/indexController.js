@@ -16,30 +16,31 @@ const path = require("path");
 
 module.exports = {
 
-    mostrarFeed: async (req, res) => {
+mostrarFeed: async (req, res) => {
         try {
             const imagenInclude = {
-            model: Imagen,
-            as: "imagenes"
-        };
-        if (!req.session.usuario) {
-            imagenInclude.where = { tipo_licencia: 'sin_copyright' };
-            imagenInclude.required = true; 
-        }
-        const publicaciones = await Publicacion.findAll({
-            where: { bajada: { [Op.not]: true } },
-            include: [
-                { model: Usuario, as: "autor", attributes: ["username"] },
-                imagenInclude,
-                { model: Etiqueta, as: "etiquetas" },
-                {
-                    model: Comentario,
-                    as: "comentarios",
-                    include: [{ model: Usuario, as: "autor" }],
-                },
-            ],
-            order: [["createdAt", "DESC"]],
-        });
+                model: Imagen,
+                as: "imagenes"
+            };
+            if (!req.session.usuario) {
+                imagenInclude.where = { tipo_licencia: 'sin_copyright' };
+                imagenInclude.required = true; 
+            }
+            const publicaciones = await Publicacion.findAll({
+                where: { bajada: { [Op.not]: true } },
+                include: [
+                    { model: Usuario, as: "autor", attributes: ["username"] },
+                    imagenInclude,
+                    { model: Etiqueta, as: "etiquetas" },
+                    {
+                        model: Comentario,
+                        as: "comentarios",
+                        include: [{ model: Usuario, as: "autor" }],
+                    },
+                ],
+                order: [["createdAt", "DESC"]],
+            });
+
             for (let pub of publicaciones) {
                 const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
                 pub.dataValues.cantidadVotos = votos.length;
@@ -47,7 +48,7 @@ module.exports = {
                     ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1) 
                     : "0.0";
             }
-            // Logica de Balance 
+
             let destacadas = [];
             let normales = [];
 
@@ -74,9 +75,18 @@ module.exports = {
                 if (indexNormales < normales.length) feedBalanceado.push(normales[indexNormales++]);
             }
 
-            res.render("index", 
-            {   titulo: "Feed Fotaza", 
+
+            let misColecciones = [];
+            if (req.session.usuario) {
+                misColecciones = await Coleccion.findAll({
+                    where: { usuario_id: req.session.usuario.id }
+                });
+            }
+
+            res.render("index", {   
+                titulo: "Feed Fotaza", 
                 publicaciones: feedBalanceado,
+                misColecciones 
             });
         } catch (error) {
             console.error("Error al cargar el feed:", error);

@@ -38,22 +38,22 @@ module.exports = {
             const publicaciones = await Publicacion.findAll({
                 where: {
                     usuario_id: usuarioId,
-                    bajada: { [Op.not]: true}
+                    bajada: { [Op.not]: true }
                 },
                 include: [
-                    { model: Imagen, as: "imagenes"},
+                    { model: Imagen, as: "imagenes" },
                     {
                         model: Comentario,
                         as: "comentarios",
-                        include: [{ model: Usuario, as: "autor"}],
+                        include: [{ model: Usuario, as: "autor" }],
                     },
-                    { model: Usuario, as: "autor"},
+                    { model: Usuario, as: "autor" },
                 ],
                 order: [["createdAt", "DESC"]],
             });
 
             for (let pub of publicaciones) {
-                const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id}});
+                const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
                 pub.dataValues.cantidadVotos = votos.length;
                 pub.dataValues.promedioValoracion = votos.length > 0
                     ? (votos.reduce((acc, v) => v.puntos, 0) / votos.length).toFixed(1)
@@ -69,6 +69,13 @@ module.exports = {
                     (seguidor) => seguidor.id == req.session.usuario.id,
                 ) || false;
             }
+            let misColecciones = [];
+            if (req.session.usuario) {
+                misColecciones = await Coleccion.findAll({
+                    where: { usuario_id: req.session.usuario.id }
+                });
+            }
+
             res.render("perfil", {
                 titulo: `Perfil de ${usuarioPerfil.username}`,
                 publicaciones,
@@ -78,6 +85,7 @@ module.exports = {
                 usuarioPerfil,
                 yaLoSigue,
                 publicacionesSeguidos: [],
+                misColecciones // <--- Pasamos las colecciones a la vista perfil.pug
             });
         } catch (error) {
             console.error("Error al cargar los datos del perfil:", error);
@@ -99,7 +107,7 @@ module.exports = {
 
             if (!usuarioLogueado || !usuarioASeguir) res.redirect('/');
 
-            const yaLoSigue = await usuarioASeguir.hasSeguidos(usuarioASeguir);
+            const yaLoSigue = await usuarioLogueado.hasSeguidos(usuarioASeguir);
 
             if (yaLoSigue) {
                 await usuarioLogueado.removeSeguidos(usuarioASeguir);
@@ -120,24 +128,30 @@ module.exports = {
         }
     },
 
-    feedSiguiendo: async (req, res) => {
+  feedSiguiendo: async (req, res) => {
         try {
             const miId = req.session.usuario.id;
-            const { Usuario, Publicacion, Imagen, Etiqueta, Comentario, Valoracion } = require("../models");
+            const { Usuario, Publicacion, Imagen, Etiqueta, Comentario, Valoracion, Coleccion } = require("../models");
             const { Op } = require("sequelize");
             
             const miUsuario = await Usuario.findByPk(miId, {
                 include: [{ model: Usuario, as: 'Seguidos', attributes: ['id'] }]
             });
             const idsSeguidos = miUsuario.Seguidos ? miUsuario.Seguidos.map(u => u.id) : [];
+            let misColecciones = [];
+            if (req.session.usuario) {
+                misColecciones = await Coleccion.findAll({
+                    where: { usuario_id: miId }
+                });
+            }
 
             if (idsSeguidos.length === 0) {
                 return res.render("index", { 
                     titulo: "Publicaciones de quienes sigues", 
-                    publicaciones: [] 
+                    publicaciones: [],
+                    misColecciones 
                 });
             }
-
             const publicaciones = await Publicacion.findAll({
                 where: {
                     usuario_id: idsSeguidos,
@@ -166,7 +180,8 @@ module.exports = {
 
             res.render("index", { 
                 titulo: "Publicaciones de quienes sigues", 
-                publicaciones 
+                publicaciones,
+                misColecciones 
             });
 
         } catch (error) {
