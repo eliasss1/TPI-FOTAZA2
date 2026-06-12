@@ -76,6 +76,26 @@ module.exports = {
                 });
             }
 
+            const idsSeguidos = usuarioPerfil.Seguidos ? usuarioPerfil.Seguidos.map(u => u.id) : [];
+
+            const publicacionesSeguidos = await Publicacion.findAll({
+                where: {
+                    usuario_id: idsSeguidos,
+                    bajada: { [Op.not]: true }
+                },
+                include: [
+                    { model: Usuario, as: "autor", attributes: ["username"] },
+                    { model: Imagen, as: "imagenes", required: true },
+                    { model: Etiqueta, as: "etiquetas" },
+                    { 
+                        model: Comentario, 
+                        as: "comentarios", 
+                        include: [{ model: Usuario, as: "autor" }] 
+                    },
+                ],
+                order: [["createdAt", "DESC"]]
+            });
+
             res.render("perfil", {
                 titulo: `Perfil de ${usuarioPerfil.username}`,
                 publicaciones,
@@ -84,7 +104,7 @@ module.exports = {
                 cantidadSeguidos,
                 usuarioPerfil,
                 yaLoSigue,
-                publicacionesSeguidos: [],
+                publicacionesSeguidos,
                 misColecciones // <--- Pasamos las colecciones a la vista perfil.pug
             });
         } catch (error) {
@@ -128,7 +148,7 @@ module.exports = {
         }
     },
 
-  feedSiguiendo: async (req, res) => {
+    /*feedSiguiendo: async (req, res) => {
         try {
             const miId = req.session.usuario.id;
             const { Usuario, Publicacion, Imagen, Etiqueta, Comentario, Valoracion, Coleccion } = require("../models");
@@ -137,7 +157,7 @@ module.exports = {
             const miUsuario = await Usuario.findByPk(miId, {
                 include: [{ model: Usuario, as: 'Seguidos', attributes: ['id'] }]
             });
-            const idsSeguidos = miUsuario.Seguidos ? miUsuario.Seguidos.map(u => u.id) : [];
+            
             let misColecciones = [];
             if (req.session.usuario) {
                 misColecciones = await Coleccion.findAll({
@@ -152,23 +172,7 @@ module.exports = {
                     misColecciones 
                 });
             }
-            const publicaciones = await Publicacion.findAll({
-                where: {
-                    usuario_id: idsSeguidos,
-                    bajada: { [Op.not]: true }
-                },
-                include: [
-                    { model: Usuario, as: "autor", attributes: ["username"] },
-                    { model: Imagen, as: "imagenes", required: true },
-                    { model: Etiqueta, as: "etiquetas" },
-                    { 
-                        model: Comentario, 
-                        as: "comentarios", 
-                        include: [{ model: Usuario, as: "autor" }] 
-                    },
-                ],
-                order: [["createdAt", "DESC"]]
-            });
+            
 
             for (let pub of publicaciones) {
                 const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
@@ -188,6 +192,6 @@ module.exports = {
             console.error("Error al cargar feed de seguidos:", error);
             res.status(500).send("Error interno");
         }
-    }
+    }*/
 
 };

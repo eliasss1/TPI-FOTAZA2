@@ -37,8 +37,12 @@ block content
                             div.border-end.border-1.pe-2
                                 if notificacion.tipo_evento === 'interes'
                                     a.text-primary.fw-bold(href=`/chat/${notificacion.actor_id}`) #{notificacion.actor.username}
+                                else if notificacion.tipo_evento == 'seguimiento'
+                                    a.text-primary.fw-bold(href=`/perfil/${notificacion.actor_id}`) #{notificacion.actor.username}
+                                else if notificacion.tipo_evento == 'comentario' || notificacion.tipo_evento == 'valoracion'
+                                    a.text-primary.fw-bold(href=`/publicacion/${notificacion.publicacion_id}`) #{notificacion.actor.username}
                                 else
-                                    strong.text-primary #{notificacion.actor.username} 
+                                    strong.text-primary #{notificacion.actor.username}
                             
                             p.card-text.text-center.text-muted.text-truncate #{notificacion.mensaje} 
                         div.border-end.border-1.d-flex.p-2(style="width:200px")

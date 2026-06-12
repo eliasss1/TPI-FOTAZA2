@@ -39,9 +39,10 @@ module.exports = {
             if (publicacion && publicacion.usuario_id !== req.session.usuario.id) {
                 await Notificacion.create({
                     tipo_evento: 'comentario',
-                    mensaje: 'Ha comentado tu publicación.',
+                    mensaje: `Ha comentado en tu publicacion "${publicacion.titulo}"`,
                     usuario_id: publicacion.usuario_id,
-                    actor_id: req.session.usuario.id
+                    actor_id: req.session.usuario.id,
+                    publicacion_id: publicacion_id
                 });
             }
 

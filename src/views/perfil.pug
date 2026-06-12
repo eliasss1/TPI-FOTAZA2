@@ -61,80 +61,186 @@ block content
                     if publicaciones && publicaciones.length > 0
                         each publicacion in publicaciones
                             div.col
-                                //El contenedor de la imagen especifica
+                                //El contenedor de la foto especifica
                                 div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
-                                    //Si tiene marca de agua se la pongo IIIIJAAA
+                                    
+                                    //Capa para Marca de Agua
                                     if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'con_copyright'
                                         div.position-absolute.top-50.start-50.translate-middle.w-100.text-center.pe-none(style="z-index: 10; opacity: 0.4; transform: translate(-50%, -50%) rotate(-30deg) !important;")
                                             p.text-dark.fw-bold.fs-4.m-0.text-uppercase= publicacion.imagenes[0].marca_agua
-                                    //Cargo la imagen y si no hay, pongo una random
+
+                                    //Contenedor de la Imagen
                                     div.position-relative.overflow-hidden.rounded-3
                                         if publicacion.imagenes && publicacion.imagenes[0]
-                                            img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 220px; w-100;")
+                                            img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 240px; width: 100%;")
                                         else
-                                            img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 220px; w-100;")
-                                    //El cuerpo donde va la informacion de la imagen
+                                            img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 240px; width: 100%;")
+
+                                    //Cuerpo de la Tarjeta
                                     div.card-body.px-2.pt-3
+                                        
+                                        //Esto verifica por las dudas de q no se incluya un autor
+                                        if publicacion.autor
+                                            a.text-primary.text-decoration-none.small.fw-bold.d-block.mb-1(href="/perfil/" + publicacion.usuario_id) #{publicacion.autor.username}
+                                        else
+                                            span.text-muted.small.d-block.mb-1
+                                                i.bi.bi-person-circle.me-1
+                                                | @comunidad_fotaza
+
+                                        //Título
                                         div.d-flex.justify-content-between.align-items-center.mb-1
                                             h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
-                                            div.d-flex.gap-2
-                                                button.btn.btn-link.p-0.text-danger
-                                                    i.bi.bi-heart-fill.fs-5
-                                                button.btn.btn-link.p-0.text-muted
-                                                    i.bi.bi-heartbreak-fill.fs-5
+
                                         //Valoracion
                                         div.d-flex.align-items-center.gap-1.mb-2
                                             span.text-warning.small
                                                 i.bi.bi-star-fill.me-1
                                                 span.fw-bold.text-dark= publicacion.dataValues.promedioValoracion || "0.0"
-                                            span.text-muted.small= `(${publicacion.dataValues.cantidadVotos || 0} votos)`
-                                        //La descripcion
+                                            span.text-muted.small= `(${publicacion.dataValues.cantidadVotos || 0} valoraciones)`
+
+                                        //Descripcion limpia y etiquetas debajo
                                         p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
-                                        //Los botones interactivos
-                                        div.d-flex.justify-content-between.align-items-center.border-top.pt-2.mt-2
-                                            button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="button")
-                                                i.bi.bi-bag-check-fill
-                                                | Detalles
-                                            
-                                            if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
-                                                span.badge.bg-danger.ms-1.small ---
-                                            else
-                                                button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
-                                                    img(src="/images/comentario.png" style="height: 20px; width: 20px")
 
-                                //VENTANA MODAL DE COMENTARIOS
-                                div.modal.fade(id=`modalComentario-${publicacion.id}` tabindex="-1" aria-hidden="true")
-                                    div.modal-dialog.modal-dialog-centered 
+                                        if publicacion.etiquetas && publicacion.etiquetas.length > 0
+                                            .d-flex.flex-wrap.gap-1.mt-2
+                                                each tag in publicacion.etiquetas
+                                                    span.badge.bg-secondary.small # #{tag.nombre}
+
+                                        //Herramientas inferiores
+                                        if usuario
+                                            div.d-flex.justify-content-between.align-items-center.border-top.pt-2.mt-2
+                                                if usuario.id !== publicacion.usuario_id
+                                                    form(action=`/publicaciones/interes/${publicacion.id}` method="POST" style="margin: 0;")
+                                                        button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="submit")
+                                                            i.bi.bi-bag-check-fill
+                                                                | Me interesa
+                                                
+                                                if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
+                                                    span.badge.bg-danger.ms-1.small ---
+                                                else
+                                                    button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
+                                                        img(src="/images/comentario.png" style="height: 20px; width: 20px")
+
+                                                // Menu para votar
+                                                if usuario && usuario.id !== publicacion.usuario_id
+                                                    .dropdown.position-relative
+                                                        button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
+                                                            img(src="/images/estrella.png" style="height: 22px; width: 20px")
+                                                        form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
+                                                            p.small.text-center.mb-1.fw-bold Puntaje
+                                                            .d-flex.gap-1.justify-content-center
+                                                                select.form-select.form-select-sm(name="puntos" required)
+                                                                    option(value="5") 5 ★
+                                                                    option(value="4") 4 ★
+                                                                    option(value="3") 3 ★
+                                                                    option(value="2") 2 ★
+                                                                    option(value="1") 1 ★
+                                                                button.btn.btn-sm.btn-warning.text-white(type="submit") Ok
+                                                else
+                                                    span.p-1.text-muted
+                                                        | ---        
+                                                
+                                                
+                                                if usuario.id !== publicacion.usuario_id
+                                                    button.btn.btn-outline-danger.btn-sm.border-0(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
+                                                        img(src="/images/bandera.png" style="height: 20px; width: 20px")
+
+                                                button.btn.btn-outline-secondary.border-0(data-bs-toggle="modal" data-bs-target=`#modalColeccion-${publicacion.id}`)
+                                                    i.bi.bi-bookmark-fill.text-primary
+
+                                if usuario
+                                    //VENTANA MODAL DE COMENTARIOS
+                                    div.modal.fade(id=`modalComentario-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                        div.modal-dialog.modal-dialog-centered 
+                                            div.modal-content.border-0.shadow-lg
+                                                div.modal-header.bg-transparent.text-secondary 
+                                                    h5.modal-title.fw-bold
+                                                        i.bi.bi-shield-fill-exclamation.me-2
+                                                        | Comentarios
+                                                    button.btn-close.btn-close-secondary(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+
+                                                div.modal-body.p-4
+                                                    div.d-flex.flex-column.p-2.overflow-auto(style="min-height: 150px; max-height: 500px")
+                                                        if publicacion.comentarios && publicacion.comentarios.length > 0
+                                                            each comentario in publicacion.comentarios
+                                                                div.gap-2.border-bottom.border-1.p-2
+                                                                    .row
+                                                                        strong.col-md-2 #{comentario.autor.username}
+                                                                        p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
+                                                                        button.col-md-1.btn.btn-outline-danger.border-0.btn-sm.position-relative(type="button")
+                                                                            img.pb-1(src="/images/bandera.png" style="height: 15px; width: 15px")
+                                                                        if publicacion.usuario_id == usuario.id
+                                                                            
+                                                                            button.col-md-1.ms-1.btn.btn-outline-danger.btn-sm.position-relative(type="button")
+                                                                                i.bi.bi-trash-fill
+
+                                                    div.border-top.border-1.p-1
+                                                        form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
+                                                            .mb-3(style="width:400px") 
+                                                                textarea#texto.form-control(type="text" name="comentario" placeholder="Comenta lo que desees..." required)
+                                                            button.btn.btn-primary.mb-3(type="submit" style="height: 60px") Comentar     
+
+                                //VENTANITA MODAL DE DENUNCIA (Solo si no es autor)
+                                if usuario.id !== publicacion.usuario_id
+                                    div.modal.fade(id=`modalDenuncia-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                        div.modal-dialog.modal-dialog-centered
+                                            div.modal-content.border-0.shadow-lg
+                                                div.modal-header.bg-danger.text-white
+                                                    h5.modal-title.fw-bold
+                                                        i.bi.bi-shield-fill-exclamation.me-2
+                                                        | Denunciar Publicación
+                                                    button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+                                                
+                                                div.modal-body.p-4
+                                                    p.text-muted.small Explicá el motivo por el cual esta imagen rompe las normas de comportamiento de la comunidad.
+                                                    form(action=`/denuncia/${publicacion.id}` method="POST")
+                                                        div.mb-3
+                                                            label.form-label.fw-bold.text-secondary Motivo de la Denuncia
+                                                            select.form-select(name="motivo" required)
+                                                                option(value="" disabled selected) Seleccioná una opcion...
+                                                                option(value="copyright") Infracción de Copyright / Plagio
+                                                                option(value="inapropiado") Contenido Inapropiado / Ofensivo
+                                                                option(value="spam") Spam o Contenido Engañoso
+                                                                option(value="otros") Otros motivos
+                                                        
+                                                        div.mb-3
+                                                            label.form-label.fw-bold.text-secondary Descripcion / Justificacion Corta
+                                                            textarea.form-control(name="justificacion" rows="3" required placeholder="Detallá de forma breve tu denuncia...")
+                                                        
+                                                        div.d-flex.justify-content-end.gap-2.mt-4
+                                                            button.btn.btn-light(type="button" data-bs-dismiss="modal") Cancelar
+                                                            button.btn.btn-danger(type="submit") Enviar Denuncia
+
+                                // VENTANITA MODAL PARA SUBIR A UNA COLECCION
+                                div.modal.fade(id=`modalColeccion-${publicacion.id}`)
+                                    div.modal-dialog.modal-dialog-centered
                                         div.modal-content.border-0.shadow-lg
-                                            //Este es la cabeza de la ventanita modal
-                                            div.modal-header.bg-transparent.text-secondary 
-                                                h5.modal-title.fw-bold
-                                                    i.bi.bi-shield-fill-exclamation.me-2
-                                                    | Comentarios
-                                                button.btn-close.btn-close-secondary(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
-
-                                            //este es el cuerpo del modal
-                                            div.modal-body.p-4
-
-                                                //¡¡¡¡IMPORTANTE MUCHACHOS!!!! ACA VA EL CONTENIDO CON LOS COMENTARIOS ADENTRO
-                                                div.d-flex.flex-column.p-2.overflow-auto(style="min-height: 150px; max-height: 500px")
-                                                    if publicacion.comentarios && publicacion.comentarios.length > 0
-
-                                                        each comentario in publicacion.comentarios
-                                                            div.gap-2.border-bottom.border-1.p-2
-                                                                .row
-                                                                    strong.col-md-2 #{comentario.autor.username}
-                                                                    p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
-                                                                
-                                                                    button.col-md-1.ms-5.btn.btn-outline-secondary.btn-sm.position-relative(type="button")
-                                                                        img.pb-1(src="/images/me-gusta.png" style="height: 15px; width: 15px")
-
-                                                //ACA ES DONDE LE DEJA COMENTAR AL USUARIO
-                                                div.border-top.border-1.p-1
-                                                    form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
-                                                        .mb-3(style="width:400px") 
-                                                            textarea#texto.form-control(type="text" name="comentario" placeholder="Comenta lo que desees..." required)
-                                                        button.btn.btn-primary.mb-3(type="submit" style="height: 60px") Comentar
+                                            div.modal-header.bg-light.border-0
+                                                h5.modal-title Guardar en Coleccion
+                                                button.btn-close(data-bs-dismiss="modal")
+                                            div.modal-body
+                                                form(action=`/colecciones/guardar/${publicacion.id}` method="POST")
+                                                    div.mb-3
+                                                        label.form-label.text-muted.small Nombre de la Coleccion
+                                                        input.form-control(type="text" name="nombreColeccion" list="listaColecciones" placeholder="Nueva colección o elige una...")
+                                                        datalist#listaColecciones
+                                                            if misColecciones
+                                                                each col in misColecciones
+                                                                    option(value=col.nombre)
+                                                    button.btn.btn-primary.w-100(type="submit") Guardar Publicacion
+                                                .dropdown.position-relative
+                                                    button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
+                                                        img(src="/images/estrella.png" style="height: 22px; width: 20px")
+                                                    form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
+                                                        p.small.text-center.mb-1.fw-bold Puntaje
+                                                        .d-flex.gap-1.justify-content-center
+                                                            select.form-select.form-select-sm(name="puntos" required)
+                                                                option(value="5") 5 ★
+                                                                option(value="4") 4 ★
+                                                                option(value="3") 3 ★
+                                                                option(value="2") 2 ★
+                                                                option(value="1") 1 ★
+                                                            button.btn.btn-sm.btn-warning.text-white(type="submit") Ok
 
                     else
                         div.col-12.text-center.py-5.my-auto
@@ -148,21 +254,186 @@ block content
                         if publicacionesSeguidos && publicacionesSeguidos.length > 0
                             each publicacion in publicacionesSeguidos
                                 div.col
+                                    //El contenedor de la foto especifica
                                     div.card.bg-light.border-secondary-subtle.shadow-sm.p-2.position-relative
                                         
+                                        //Capa para Marca de Agua
+                                        if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].tipo_licencia === 'con_copyright'
+                                            div.position-absolute.top-50.start-50.translate-middle.w-100.text-center.pe-none(style="z-index: 10; opacity: 0.4; transform: translate(-50%, -50%) rotate(-30deg) !important;")
+                                                p.text-dark.fw-bold.fs-4.m-0.text-uppercase= publicacion.imagenes[0].marca_agua
+
+                                        //Contenedor de la Imagen
                                         div.position-relative.overflow-hidden.rounded-3
                                             if publicacion.imagenes && publicacion.imagenes[0]
-                                                img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 220px; w-100;")
+                                                img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 240px; width: 100%;")
+                                            else
+                                                img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 240px; width: 100%;")
 
+                                        //Cuerpo de la Tarjeta
                                         div.card-body.px-2.pt-3
+                                            
+                                            //Esto verifica por las dudas de q no se incluya un autor
+                                            if publicacion.autor
+                                                a.text-primary.text-decoration-none.small.fw-bold.d-block.mb-1(href="/perfil/" + publicacion.usuario_id) #{publicacion.autor.username}
+                                            else
+                                                span.text-muted.small.d-block.mb-1
+                                                    i.bi.bi-person-circle.me-1
+                                                    | @comunidad_fotaza
+
+                                            //Título
                                             div.d-flex.justify-content-between.align-items-center.mb-1
                                                 h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
-                                                div.d-flex.gap-2
-                                                    button.btn.btn-link.p-0.text-danger
-                                                        i.bi.bi-heart-fill.fs-5
-                                            
-                                            p.text-primary.small.fw-bold.mb-1= `@${publicacion.autor.username}`
-                                            p.card-text.text-muted.text-truncate.small.mb-2= publicacion.descripcion
+
+                                            //Valoracion
+                                            div.d-flex.align-items-center.gap-1.mb-2
+                                                span.text-warning.small
+                                                    i.bi.bi-star-fill.me-1
+                                                    span.fw-bold.text-dark= publicacion.dataValues.promedioValoracion || "0.0"
+                                                span.text-muted.small= `(${publicacion.dataValues.cantidadVotos || 0} valoraciones)`
+
+                                            //Descripcion limpia y etiquetas debajo
+                                            p.card-text.text-muted.text-truncate.small.mb-3= publicacion.descripcion
+
+                                            if publicacion.etiquetas && publicacion.etiquetas.length > 0
+                                                .d-flex.flex-wrap.gap-1.mt-2
+                                                    each tag in publicacion.etiquetas
+                                                        span.badge.bg-secondary.small # #{tag.nombre}
+
+                                            //Herramientas inferiores
+                                            if usuario
+                                                div.d-flex.justify-content-between.align-items-center.border-top.pt-2.mt-2
+                                                    if usuario.id !== publicacion.usuario_id
+                                                        form(action=`/publicaciones/interes/${publicacion.id}` method="POST" style="margin: 0;")
+                                                            button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="submit")
+                                                                i.bi.bi-bag-check-fill
+                                                                    | Me interesa
+                                                    
+                                                    if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
+                                                        span.badge.bg-danger.ms-1.small ---
+                                                    else
+                                                        button.btn.btn-outline-secondary.btn-sm.border-0.position-relative(type="button" data-bs-toggle="modal" data-bs-target=`#modalComentario-${publicacion.id}`)
+                                                            img(src="/images/comentario.png" style="height: 20px; width: 20px")
+
+                                                    // Menu para votar
+                                                    if usuario && usuario.id !== publicacion.usuario_id
+                                                        .dropdown.position-relative
+                                                            button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
+                                                                img(src="/images/estrella.png" style="height: 22px; width: 20px")
+                                                            form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
+                                                                p.small.text-center.mb-1.fw-bold Puntaje
+                                                                .d-flex.gap-1.justify-content-center
+                                                                    select.form-select.form-select-sm(name="puntos" required)
+                                                                        option(value="5") 5 ★
+                                                                        option(value="4") 4 ★
+                                                                        option(value="3") 3 ★
+                                                                        option(value="2") 2 ★
+                                                                        option(value="1") 1 ★
+                                                                    button.btn.btn-sm.btn-warning.text-white(type="submit") Ok
+                                                    else
+                                                        span.p-1.text-muted
+                                                            | ---        
+                                                    
+                                                    
+                                                    if usuario.id !== publicacion.usuario_id
+                                                        button.btn.btn-outline-danger.btn-sm.border-0(type="button" data-bs-toggle="modal" data-bs-target=`#modalDenuncia-${publicacion.id}`)
+                                                            img(src="/images/bandera.png" style="height: 20px; width: 20px")
+
+                                                    button.btn.btn-outline-secondary.border-0(data-bs-toggle="modal" data-bs-target=`#modalColeccion-${publicacion.id}`)
+                                                        i.bi.bi-bookmark-fill.text-primary
+                                    if usuario
+                                    //VENTANA MODAL DE COMENTARIOS
+                                    div.modal.fade(id=`modalComentario-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                        div.modal-dialog.modal-dialog-centered 
+                                            div.modal-content.border-0.shadow-lg
+                                                div.modal-header.bg-transparent.text-secondary 
+                                                    h5.modal-title.fw-bold
+                                                        i.bi.bi-shield-fill-exclamation.me-2
+                                                        | Comentarios
+                                                    button.btn-close.btn-close-secondary(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+
+                                                div.modal-body.p-4
+                                                    div.d-flex.flex-column.p-2.overflow-auto(style="min-height: 150px; max-height: 500px")
+                                                        if publicacion.comentarios && publicacion.comentarios.length > 0
+                                                            each comentario in publicacion.comentarios
+                                                                div.gap-2.border-bottom.border-1.p-2
+                                                                    .row
+                                                                        strong.col-md-2 #{comentario.autor.username}
+                                                                        p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
+                                                                        button.col-md-1.btn.btn-outline-danger.border-0.btn-sm.position-relative(type="button")
+                                                                            img.pb-1(src="/images/bandera.png" style="height: 15px; width: 15px")
+                                                                        if publicacion.usuario_id == usuario.id
+                                                                            
+                                                                            button.col-md-1.ms-1.btn.btn-outline-danger.btn-sm.position-relative(type="button")
+                                                                                i.bi.bi-trash-fill
+
+                                                    div.border-top.border-1.p-1
+                                                        form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
+                                                            .mb-3(style="width:400px") 
+                                                                textarea#texto.form-control(type="text" name="comentario" placeholder="Comenta lo que desees..." required)
+                                                            button.btn.btn-primary.mb-3(type="submit" style="height: 60px") Comentar     
+
+                                    //VENTANITA MODAL DE DENUNCIA (Solo si no es autor)
+                                    if usuario.id !== publicacion.usuario_id
+                                        div.modal.fade(id=`modalDenuncia-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                            div.modal-dialog.modal-dialog-centered
+                                                div.modal-content.border-0.shadow-lg
+                                                    div.modal-header.bg-danger.text-white
+                                                        h5.modal-title.fw-bold
+                                                            i.bi.bi-shield-fill-exclamation.me-2
+                                                            | Denunciar Publicación
+                                                        button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+                                                    
+                                                    div.modal-body.p-4
+                                                        p.text-muted.small Explicá el motivo por el cual esta imagen rompe las normas de comportamiento de la comunidad.
+                                                        form(action=`/denuncia/${publicacion.id}` method="POST")
+                                                            div.mb-3
+                                                                label.form-label.fw-bold.text-secondary Motivo de la Denuncia
+                                                                select.form-select(name="motivo" required)
+                                                                    option(value="" disabled selected) Seleccioná una opcion...
+                                                                    option(value="copyright") Infracción de Copyright / Plagio
+                                                                    option(value="inapropiado") Contenido Inapropiado / Ofensivo
+                                                                    option(value="spam") Spam o Contenido Engañoso
+                                                                    option(value="otros") Otros motivos
+                                                            
+                                                            div.mb-3
+                                                                label.form-label.fw-bold.text-secondary Descripcion / Justificacion Corta
+                                                                textarea.form-control(name="justificacion" rows="3" required placeholder="Detallá de forma breve tu denuncia...")
+                                                            
+                                                            div.d-flex.justify-content-end.gap-2.mt-4
+                                                                button.btn.btn-light(type="button" data-bs-dismiss="modal") Cancelar
+                                                                button.btn.btn-danger(type="submit") Enviar Denuncia
+
+                                    // VENTANITA MODAL PARA SUBIR A UNA COLECCION
+                                    div.modal.fade(id=`modalColeccion-${publicacion.id}`)
+                                        div.modal-dialog.modal-dialog-centered
+                                            div.modal-content.border-0.shadow-lg
+                                                div.modal-header.bg-light.border-0
+                                                    h5.modal-title Guardar en Coleccion
+                                                    button.btn-close(data-bs-dismiss="modal")
+                                                div.modal-body
+                                                    form(action=`/colecciones/guardar/${publicacion.id}` method="POST")
+                                                        div.mb-3
+                                                            label.form-label.text-muted.small Nombre de la Coleccion
+                                                            input.form-control(type="text" name="nombreColeccion" list="listaColecciones" placeholder="Nueva colección o elige una...")
+                                                            datalist#listaColecciones
+                                                                if misColecciones
+                                                                    each col in misColecciones
+                                                                        option(value=col.nombre)
+                                                        button.btn.btn-primary.w-100(type="submit") Guardar Publicacion
+                                                    .dropdown.position-relative
+                                                        button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
+                                                            img(src="/images/estrella.png" style="height: 22px; width: 20px")
+                                                        form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
+                                                            p.small.text-center.mb-1.fw-bold Puntaje
+                                                            .d-flex.gap-1.justify-content-center
+                                                                select.form-select.form-select-sm(name="puntos" required)
+                                                                    option(value="5") 5 ★
+                                                                    option(value="4") 4 ★
+                                                                    option(value="3") 3 ★
+                                                                    option(value="2") 2 ★
+                                                                    option(value="1") 1 ★
+                                                                button.btn.btn-sm.btn-warning.text-white(type="submit") Ok
+
                         else
                             div.col-12.text-center.py-5.my-auto
                                 i.bi.bi-people.text-secondary.opacity-25(style="font-size: 4rem;")

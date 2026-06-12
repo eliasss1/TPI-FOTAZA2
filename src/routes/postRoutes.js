@@ -12,6 +12,7 @@ const layoutController = require('../controllers/layoutController');
 const {estaAutenticado, esModerador} = require('../middlewares/authMiddleware');
 
 
+
 //RUTAS DE CREAR PUBLICACION
 router.get('/nueva-publicacion', estaAutenticado, nuevaPubliController.mostrarFormulario);
 router.post('/publicaciones/crear', estaAutenticado, nuevaPubliController.crearPublicacion);
@@ -30,10 +31,11 @@ router.get('/moderacion', estaAutenticado, esModerador, moderacionController.mos
 router.post('/moderacion/rechazar/:id', estaAutenticado, esModerador, moderacionController.rechazarDenuncia);
 router.post('/moderacion/aceptar/:id', estaAutenticado, esModerador, moderacionController.aceptarDenuncia);
 router.post('/denuncia/:id', estaAutenticado, postController.crearDenuncia);
+
 //RUTAS NOTIFICACIONES
 router.get('/notificaciones', estaAutenticado, notiController.mostrarNotificaciones);
 router.post('/notificaciones/leer/:id', estaAutenticado, notiController.marcarNotificacionLeida);
-
+router.get('/publicacion/:id', estaAutenticado, notiController.mostrarPublicacionUnica);
 
 //RUTAS DE COLECCIONES
 router.get('/colecciones', estaAutenticado, coleccionesController.cargarColecciones)
@@ -47,6 +49,7 @@ router.get('/chat/:conUsuarioId', estaAutenticado, chatController.mostrarChatPri
 router.get('/perfil', estaAutenticado, perfilController.mostrarPerfil);
 router.get('/perfil/:id', estaAutenticado, perfilController.mostrarPerfil);
 router.post('/perfil/:id/seguir', estaAutenticado, perfilController.seguirUsuario);
-router.get('/siguiendo', estaAutenticado, perfilController.feedSiguiendo);
+
+//METODO NO FUNCIONAL: router.get('/siguiendo/', estaAutenticado, perfilController.feedSiguiendo);
 
 module.exports = router;

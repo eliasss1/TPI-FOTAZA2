@@ -83,8 +83,8 @@ block content
                                             if usuario.id !== publicacion.usuario_id
                                                 form(action=`/publicaciones/interes/${publicacion.id}` method="POST" style="margin: 0;")
                                                     button.btn.btn-primary.btn-sm.d-flex.align-items-center.gap-1(type="submit")
-                                                    i.bi.bi-bag-check-fill
-                                                    | Me interesa
+                                                        i.bi.bi-bag-check-fill
+                                                            | Me interesa
                                             
                                             if publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos === false
                                                 span.badge.bg-danger.ms-1.small ---
@@ -202,23 +202,22 @@ block content
                                                             if misColecciones
                                                                 each col in misColecciones
                                                                     option(value=col.nombre)
-                                                    button.btn.btn-primary.w-100(type="submit") Guardar Publicacion                            
+                                                    button.btn.btn-primary.w-100(type="submit") Guardar Publicacion
+                                                .dropdown.position-relative
+                                                    button.btn.btn-outline-secondary.border-0.btn-sm.position-relative(type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Valorar publicacion")
+                                                        img(src="/images/estrella.png" style="height: 22px; width: 20px")
+                                                    form.dropdown-menu.position-absolute.p-2.shadow(action=`/valorar/${publicacion.id}` method="POST" style="min-width: 130px; z-index: 1050;")
+                                                        p.small.text-center.mb-1.fw-bold Puntaje
+                                                        .d-flex.gap-1.justify-content-center
+                                                            select.form-select.form-select-sm(name="puntos" required)
+                                                                option(value="5") 5 ★
+                                                                option(value="4") 4 ★
+                                                                option(value="3") 3 ★
+                                                                option(value="2") 2 ★
+                                                                option(value="1") 1 ★
+                                                            button.btn.btn-sm.btn-warning.text-white(type="submit") Ok                            
             else
                 div.col-12.text-center.py-5.my-auto
                     i.bi.bi-image-fill.text-secondary.opacity-25(style="font-size: 5rem;")
                     h4.fw-bold.text-secondary.mt-3 No hay publicaciones disponibles
                     p.text-muted Las fotos que suba la comunidad apareceran automaticamente en este feed.
-
-        //Paginacion
-        nav.mt-auto.pt-4(aria-label="Paginacion de fotos")
-            ul.pagination.justify-content-center.mb-0
-                li.page-item.disabled
-                    a.page-link(href="#" tabindex="-1") Anterior
-                li.page-item.active
-                    a.page-link(href="#") 1
-                li.page-item
-                    a.page-link(href="#") 2
-                li.page-item
-                    a.page-link(href="#") 3
-                li.page-item
-                    a.page-link(href="#") Siguiente

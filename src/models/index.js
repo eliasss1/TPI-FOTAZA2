@@ -33,6 +33,10 @@ Notificacion.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'receptor' });
 // Una notificación es PROVOCADA por otro usuario (actor)
 Notificacion.belongsTo(Usuario, { foreignKey: 'actor_id', as: 'actor' });
 
+//Una publicacion puede hacer muchas notis, pero una noti pertenece solo a una publi
+Publicacion.hasMany(Notificacion, { foreignKey: 'publicacion_id', onDelete: 'CASCADE' });
+Notificacion.belongsTo(Publicacion, { foreignKey: 'publicacion_id' });
+
 //una publicacion tiene muchas imagenes (si se borra la publicacion se borran las imagenes)
 Publicacion.hasMany(Imagen, {foreignKey: 'publicacion_id', as: 'imagenes', onDelete: 'CASCADE'});
 Imagen.belongsTo(Publicacion, {foreignKey: 'publicacion_id'});
