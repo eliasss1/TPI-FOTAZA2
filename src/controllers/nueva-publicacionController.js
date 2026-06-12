@@ -22,72 +22,75 @@ module.exports = {
     },
 
     crearPublicacion: (req, res) => {
-        const formidable = require("formidable");
-        const path = require("path");
-        const fs = require("fs");
+    const formidable = require("formidable");
+    const fs = require("fs");
+    const os = require("os"); 
 
-        const uploadDir = path.join(__dirname, "../public/images");
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+    const form = new formidable.IncomingForm({
+        uploadDir: os.tmpdir(), 
+        keepExtensions: true,
+        multiples: true,
+    });
 
-        const form = new formidable.IncomingForm({
-            uploadDir: uploadDir,
-            keepExtensions: true,
-            multiples: true,
-        });
-
-        form.parse(req, async (err, fields, files) => {
-            if (err) return res.status(500).send("Error al procesar el formulario");
+    form.parse(req, async (err, fields, files) => {
+        if (err) return res.status(500).send("Error al procesar el formulario");
+        
+        try {
+            const titulo = Array.isArray(fields.titulo) ? fields.titulo[0] : fields.titulo;
+            const descripcion = Array.isArray(fields.descripcion) ? fields.descripcion[0] : fields.descripcion;
+            const tipo_licencia = Array.isArray(fields.tipo_licencia) ? fields.tipo_licencia[0] : fields.tipo_licencia;
+            const marca_agua = Array.isArray(fields.marca_agua) ? fields.marca_agua[0] : fields.marca_agua;
+            const etiquetas = Array.isArray(fields.etiquetas) ? fields.etiquetas[0] : fields.etiquetas;
             
-            try {
-                    const titulo = Array.isArray(fields.titulo) ? fields.titulo[0] : fields.titulo;
-                    const descripcion = Array.isArray(fields.descripcion) ? fields.descripcion[0] : fields.descripcion;
-                    const tipo_licencia = Array.isArray(fields.tipo_licencia) ? fields.tipo_licencia[0] : fields.tipo_licencia;
-                    const marca_agua = Array.isArray(fields.marca_agua) ? fields.marca_agua[0] : fields.marca_agua;
-                    const etiquetas = Array.isArray(fields.etiquetas) ? fields.etiquetas[0] : fields.etiquetas;
+            const comentarios_abiertos = fields.comentarios ? true : false;
+
+            const nuevaPub = await Publicacion.create({
+                titulo,
+                descripcion,
+                usuario_id: req.session.usuario.id,
+            });
+
+            let imagenesSubidas = files.imagenes;
+            if (!imagenesSubidas) imagenesSubidas = []; 
+            if (!Array.isArray(imagenesSubidas)) imagenesSubidas = [imagenesSubidas];
+
+            for (let img of imagenesSubidas) {
+                if (img && img.filepath && img.size > 0) {
                     
-                    const comentarios_abiertos = fields.comentarios ? true : false;
+                    const fileData = fs.readFileSync(img.filepath);
+                    const base64Image = Buffer.from(fileData).toString('base64');
+                    const mimeType = img.mimetype || 'image/jpeg';
+                    const url_path_base64 = `data:${mimeType};base64,${base64Image}`;
 
-                    const nuevaPub = await Publicacion.create({
-                        titulo,
-                        descripcion,
-                        usuario_id: req.session.usuario.id,
+                    await Imagen.create({
+                        url_path: url_path_base64, 
+                        tipo_licencia: tipo_licencia || "con_copyright",
+                        marca_agua: marca_agua || null,
+                        comentarios_abiertos: comentarios_abiertos,
+                        publicacion_id: nuevaPub.id,
                     });
-
-                    let imagenesSubidas = files.imagenes;
-                    if (!Array.isArray(imagenesSubidas)) imagenesSubidas = [imagenesSubidas];
-
-                    for (let img of imagenesSubidas) {
-                        if (img && img.newFilename) {
-                            await Imagen.create({
-                                url_path: "/images/" + img.newFilename,
-                                tipo_licencia: tipo_licencia || "con_copyright",
-                                marca_agua: marca_agua || null,
-                                comentarios_abiertos: comentarios_abiertos, // NUEVO: Guardamos la decisión del usuario
-                                publicacion_id: nuevaPub.id,
-                            });
-                        }
-                    }
-                if (etiquetas) {
-                    const listaEtiquetas = etiquetas.split(',')
-                        .map(e => e.trim().toLowerCase())
-                        .filter(e => e.length > 0);
-
-                    for (let nombre of listaEtiquetas) {
-                        const [etiquetaInstancia] = await Etiqueta.findOrCreate({
-                            where: { nombre }
-                        });
-                        await nuevaPub.addEtiqueta(etiquetaInstancia);
-                    }
                 }
-
-                res.redirect("/");
-            } catch (error) {
-                console.error("Error DB:", error);
-                res.status(500).send("Error al guardar en la base de datos");
             }
-        });
+
+            if (etiquetas) {
+                const listaEtiquetas = etiquetas.split(',')
+                    .map(e => e.trim().toLowerCase())
+                    .filter(e => e.length > 0);
+
+                for (let nombre of listaEtiquetas) {
+                    const [etiquetaInstancia] = await Etiqueta.findOrCreate({
+                        where: { nombre }
+                    });
+                    await nuevaPub.addEtiqueta(etiquetaInstancia);
+                }
+            }
+
+            res.redirect("/");
+        } catch (error) {
+            console.error("Error DB:", error);
+            res.status(500).send("Error al guardar en la base de datos");
+        }
+    });
     },
 
     cerrarComentarios: async (req, res) => {
