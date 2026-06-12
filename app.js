@@ -42,13 +42,6 @@ const {estaAutenticado, esModerador} = require('./src/middlewares/authMiddleware
 
 // Iniciar el servidor
 
-app.get('/moderacion', estaAutenticado, esModerador, (req, res) => {
-    res.render('moderacion');
-});
-
-app.get('/notificaciones', estaAutenticado, (req, res) => {
-    res.render('notificaciones');
-});
 
 const Port = process.env.Port || 3000;
 
