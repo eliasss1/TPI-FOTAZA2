@@ -42,10 +42,10 @@ block content
                 each denuncia in listaDenuncias
                     div.d-flex.border-bottom.border-1.bg-light.shadow-sm.mb-2.p-2(style="overflow: hidden;")
                         
-                        n
+                        
                         div.border-end.border-2.px-3(style="min-width: 250px;")
                             h5.card-title.fw-bold= denuncia.titulo
-                            p.card-text.text-muted Subido por: @#{denuncia.autor.username}
+                            a.text-primary.fw-bold(href=`/publicacion/${denuncia.publicacion_id}`) @#{denuncia.autor.username}
                         
                         
                         div.px-3.flex-grow-1

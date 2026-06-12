@@ -5,7 +5,7 @@ async function iniciarDB() {
         await sequelize.authenticate();
         console.log('Conexion a PostgreSQL establecida correctamente.');
         //chicos le pongo el force asi destruye las tablas y las crea devuelta asi vamos probando xd
-        await sequelize.sync({ force: true});
+        //await sequelize.sync({ force: true});
 
         console.log('Todas las tablas fueron creadas correctamente');
         process.exit(0);
