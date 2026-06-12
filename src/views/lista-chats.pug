@@ -1,0 +1,40 @@
+extends layout
+
+block content
+    style. 
+        .burbuja-chat {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .burbuja-chat:hover {
+            transform: scale(1.01);
+            background-color: #f8f9fa !important;
+        }
+
+    div.container.bg-light.shadow-lg.p-4.rounded-1(style="height: calc(100vh - 5rem); overflow: auto")
+        
+        //Cabecera
+        div.border-bottom.border-1.mb-4.p-2
+            h4.text-secondary.fw-bold Bandeja de Mensajes
+
+        //Contenedor de las burbujas
+        div.d-flex.flex-column.gap-3.px-2
+            if chats && chats.length > 0
+                each chat in chats
+                    a.text-decoration-none(href=`/chat/${chat.otroUsuario.id}`)
+                        //Burbuja de chat individual
+                        div.card.burbuja-chat.d-flex.flex-row.align-items-center.shadow-sm.p-3.border-0.rounded-4.bg-white
+                            
+                            //Avatar inicial
+                            div.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold.me-3.shadow-sm(style="width: 55px; height: 55px; font-size: 1.5rem;")
+                                = chat.otroUsuario.username.charAt(0).toUpperCase()
+                            
+                            //Textos
+                            div.flex-grow-1.overflow-hidden
+                                h5.mb-1.fw-bold.text-dark= chat.otroUsuario.username
+                                p.mb-0.text-muted.text-truncate= chat.ultimoMensaje
+            else
+                //Mensaje vacio
+                div.text-center.py-5.my-auto
+                    i.bi.bi-chat-square-dots.text-secondary.opacity-25(style="font-size: 4rem;")
+                    h5.fw-bold.text-secondary.mt-3 No tienes conversaciones activas

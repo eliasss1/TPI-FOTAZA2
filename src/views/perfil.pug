@@ -53,10 +53,10 @@ block content
                         | Contenido de usuarios que sigo
 
         //Contenedor de las Secciones
-        div.tab-content.flex-grow-1.d-flex.flex-column.overflow-auto(id="perfilTabsContent")
+        div.tab-content.flex-grow-1.d-flex.flex-column.overflow-auto.position-relative(id="perfilTabsContent")
             
             //PESTAÑA A: PUBLICACIONES PROPIAS
-            div.tab-pane.fade.show.active.flex-grow-1.d-flex.flex-column(id="mis-fotos" role="tabpanel" aria-labelledby="mis-fotos-tab")
+            div.tab-pane.fade.show.active.d-flex.flex-column.position-absolute(id="mis-fotos" role="tabpanel" aria-labelledby="mis-fotos-tab" style="width: 100%")
                 div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
                     if publicaciones && publicaciones.length > 0
                         each publicacion in publicaciones
@@ -249,7 +249,7 @@ block content
 
             //PESTAÑA B: PUBLICACIONES DE USUARIOS QUE SIGO
             if esPropioPerfil
-                div.tab-pane.fade.flex-grow-1.d-flex.flex-column(id="seguidos" role="tabpanel" aria-labelledby="seguidos-tab")
+                div.tab-pane.fade.flex-grow-1.d-flex.flex-column.position-absolute(id="seguidos" role="tabpanel" aria-labelledby="seguidos-tab" style="width: 100%")
                     div.row.row-cols-1.row-cols-md-3.g-4.flex-grow-1.align-items-start
                         if publicacionesSeguidos && publicacionesSeguidos.length > 0
                             each publicacion in publicacionesSeguidos

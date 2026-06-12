@@ -1,35 +1,32 @@
 extends layout 
 
 block content 
-
     div.container.p-4.d-flex.flex-column.bg-white.shadow-lg(style="height: calc(100vh - 5rem)")
-        //Este es el div que tiene la gilada de ela cabecera
+        //Cabecera del chat
         div.d-flex.gap-2.align-items-center.border-bottom.border-1.border-dark(style="height: 150px")
-            div.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold(style="width: 70px; height: 70px; font-size: 2rem;") S
-                //= usuarioPerfil.username.charAt(0).toUpperCase()
-            h2.fw-bold.mb-1.text-dark //= usuarioPerfil.username
+            div.bg-primary.text-white.rounded-circle.d-flex.align-items-center.justify-content-center.fw-bold(style="width: 70px; height: 70px; font-size: 2rem;")= receptor.username.charAt(0).toUpperCase()
+            h2.fw-bold.mb-1.text-dark= receptor.username
 
-        //Este es el contenedor que guarda todos los mensajes
-        div.d-flex.flex-column.flex-grow-1.bg-primary.position-relative.overflow-y
+        //Contenedor de mensajes
+        div.d-flex.flex-column.flex-grow-1.position-relative.overflow-auto
+            if mensajes && mensajes.length > 0
+                each mensaje in mensajes
+                    if mensaje.emisor_id === usuario.id
+                        //Si el mensaje es propio
+                        div.d-flex.w-100.my-2.position-relative.justify-content-end.align-items-center.p-2(style="min-height: 100px")
+                            div.card-text.text-start.rounded-5.bg-primary.text-white.p-3.text-break.text-wrap(style="max-width: 400px; min-height: 50px") 
+                                p.mb-0= mensaje.texto
+                    else
+                        //Si el mensaje es del otro chabon
+                        div.d-flex.w-100.my-2.position-relative.justify-content-start.align-items-center.p-2(style="min-height: 100px")
+                            div.card-text.text-start.rounded-5.bg-secondary.text-white.p-3.text-break.text-wrap(style="max-width: 400px; min-height: 50px") 
+                                p.mb-0= mensaje.texto
+            else
+                p.text-center.text-muted.mt-5 No hay mensajes todavia.
 
-            //Este seria el ejemplo de la estructura de un mensaje, en este caso es con el que "estamos hablando"
-            //En caso de que necesites mandar un mensaje propio, el div de abajo en vez de tener justify-content-start, seria end.
-            //Estan en colores los contenedores para que te sirva para identificarlos, cuando los cambies, sacale los bg-, menos en el card
-            //en el card cambiaselo el color por bg-primary
-            div.d-flex.w-100.my-2.bg-success.position-relative.justify-content-start.align-items-center.p-2(style="min-height: 100px")
-                //Este es el card donde va el texto, basicamente es la burbuja del msj
-                div.card-text.text-start.rounded-5.bg-danger.p-3.text-break.text-wrap(style="max-width: 400px; min-height: 50px") 
-                    p.mb-0 WACHIN SOS RE WACHINnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-
-            //Fijate en este segundo msj DE EJEMPLO, tiene el justify-content-end y por eso sale del otro lado.        
-            div.d-flex.w-100.my-2.bg-success.position-relative.justify-content-end.align-items-center.p-2(style="min-height: 100px")
-                div.card-text.text-start.rounded-5.bg-danger.p-3.text-break.text-wrap(style="max-width: 400px; min-height: 50px") 
-                    p.mb-0 vos sos re wachin gil
-
-        div.d-flex.bg-secondary.border-top.border-1.border-dark(style="height: 100px")
-            form.d-flex.p-2.gap-5.position-relative(action="mensaje" method="POST")
-                .mb-3(style="width:1100px") 
-                    textarea.form-control(type="text" name="comentario" placeholder="Envia un mensaje....." required)
+        //Formulario de envio
+        div.d-flex.border-top.border-1.border-dark(style="height: 100px")
+            form.d-flex.w-100.p-2.gap-5.position-relative.align-items-center(action=`/chat/${chat.id}/enviar` method="POST")
+                .flex-grow-1
+                    textarea.form-control(name="texto" placeholder="Envia un mensaje....." required style="resize: none;")
                 button.btn.btn-primary(type="submit" style="height: 60px") Enviar
-
-            

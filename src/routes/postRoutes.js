@@ -44,6 +44,8 @@ router.get('/colecciones/:id', estaAutenticado, coleccionesController.mostrarCol
 
 //RUTAS CHAT
 router.get('/chat/:conUsuarioId', estaAutenticado, chatController.mostrarChatPrivado);
+router.post('/chat/:chatId/enviar', estaAutenticado, chatController.enviarMensaje);
+router.get('/mensajes', estaAutenticado, chatController.mostrarBandejaChats);
 
 //RUTAS DE PERFIL
 router.get('/perfil', estaAutenticado, perfilController.mostrarPerfil);

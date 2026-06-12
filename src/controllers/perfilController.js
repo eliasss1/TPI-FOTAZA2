@@ -105,7 +105,7 @@ module.exports = {
                 usuarioPerfil,
                 yaLoSigue,
                 publicacionesSeguidos,
-                misColecciones // <--- Pasamos las colecciones a la vista perfil.pug
+                misColecciones
             });
         } catch (error) {
             console.error("Error al cargar los datos del perfil:", error);

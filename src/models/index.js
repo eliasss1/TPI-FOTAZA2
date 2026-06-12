@@ -11,6 +11,8 @@ const Denuncia = require('./denuncia');
 const Notificacion = require('./notificacion');
 const Coleccion = require('./coleccion');
 const Valoracion = require('./valoracion');
+const Chat = require('./chat');
+const Mensaje = require('./mensaje');
 
 
 // asociaciones
@@ -40,6 +42,20 @@ Notificacion.belongsTo(Publicacion, { foreignKey: 'publicacion_id' });
 //una publicacion tiene muchas imagenes (si se borra la publicacion se borran las imagenes)
 Publicacion.hasMany(Imagen, {foreignKey: 'publicacion_id', as: 'imagenes', onDelete: 'CASCADE'});
 Imagen.belongsTo(Publicacion, {foreignKey: 'publicacion_id'});
+
+//Relacion de los chat
+Usuario.hasMany(Chat, { as: 'chatsIniciados', foreignKey: 'usuario1_id' });
+Chat.belongsTo(Usuario, { as: 'iniciador', foreignKey: 'usuario1_id' });
+
+Usuario.hasMany(Chat, { as: 'chatsRecibidos', foreignKey: 'usuario2_id' });
+Chat.belongsTo(Usuario, { as: 'receptor', foreignKey: 'usuario2_id' });
+
+// Relaciones de Mensaje
+Chat.hasMany(Mensaje, { as: 'mensajes', foreignKey: 'chat_id', onDelete: 'CASCADE' });
+Mensaje.belongsTo(Chat, { foreignKey: 'chat_id' });
+
+Usuario.hasMany(Mensaje, { foreignKey: 'emisor_id' });
+Mensaje.belongsTo(Usuario, { as: 'emisor', foreignKey: 'emisor_id' });
 
 //relacion de seguidores
 Usuario.belongsToMany(Usuario, {
@@ -88,5 +104,7 @@ module.exports = {
     Denuncia,
     Notificacion,
     Coleccion,
-    Valoracion
+    Valoracion,
+    Chat,
+    Mensaje
 };
