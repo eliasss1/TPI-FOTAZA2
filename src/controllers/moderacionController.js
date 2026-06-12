@@ -30,7 +30,7 @@ module.exports = {
                 attributes: ["publicacion_id"],
                 where: { resuelta: false },
                 group: ["publicacion_id"],
-                having: sequelize.literal("COUNT(DISTINCT usuario_id) > 3"),
+                having: sequelize.literal("COUNT(DISTINCT usuario_id) > 0"), 
             });
 
             const idsPublicaciones = publicacionesComprometidas.map(
@@ -125,24 +125,39 @@ module.exports = {
         }
     },
 
-    aceptarDenuncia: async (req, res) => {
+ aceptarDenuncia: async (req, res) => {
         try {
             const idDenuncia = req.params.id;
-            const { Denuncia, Publicacion, Usuario } = require("../models");
+            const moderadorId = req.session.usuario.id; // ID del moderador que ejecuta la acción
+            
+            // IMPORTANTE: Asegúrate de requerir el modelo Notificacion aquí
+            const { Denuncia, Publicacion, Usuario, Notificacion } = require("../models"); 
+            
             const denuncia = await Denuncia.findByPk(idDenuncia);
             if (!denuncia) return res.redirect("/moderacion");
+            
             const publicacionId = denuncia.publicacion_id;
             const publicacion = await Publicacion.findByPk(publicacionId);
 
             if (publicacion) {
                 const autorId = publicacion.usuario_id || publicacion.UsuarioId;
 
+                // 1. Borrado lógico de la publicación
                 await Publicacion.update(
                     { bajada: true },
                     { where: { id: publicacionId } },
                 );
                 console.log(`Publicación ${publicacionId} dada de baja exitosamente.`);
 
+                // 2. Notificación al usuario de que su post fue eliminado
+                await Notificacion.create({
+                    tipo_evento: 'moderacion',
+                    mensaje: 'Tu publicación ha sido eliminada por infringir las normas de la comunidad.',
+                    usuario_id: autorId,
+                    actor_id: moderadorId
+                });
+
+                // 3. Conteo de reincidencias
                 const cantidadBajas = await Publicacion.count({
                     where: {
                         [publicacion.usuario_id ? "usuario_id" : "UsuarioId"]: autorId,
@@ -152,12 +167,27 @@ module.exports = {
 
                 if (cantidadBajas >= 3) {
                     await Usuario.update({ activo: false }, { where: { id: autorId } });
-                    console.log(
-                        `⚠️ El usuario ${autorId} alcanzó las 3 bajas. Cuenta inactivada.`,
-                    );
+                    console.log(`⚠️ El usuario ${autorId} alcanzó las 3 bajas. Cuenta inactivada.`);
+                    
+                    // Notificación de cuenta suspendida (queda en la BD como registro)
+                    await Notificacion.create({
+                        tipo_evento: 'sancion',
+                        mensaje: 'Tu cuenta ha sido suspendida permanentemente por acumular 3 infracciones.',
+                        usuario_id: autorId,
+                        actor_id: moderadorId
+                    });
+                } else if (cantidadBajas === 2) {
+                    // Advertencia preventiva al llegar a 2 faltas
+                    await Notificacion.create({
+                        tipo_evento: 'advertencia',
+                        mensaje: '⚠️ Atención: Tienes 2 publicaciones eliminadas. Una infracción más y tu cuenta será suspendida.',
+                        usuario_id: autorId,
+                        actor_id: moderadorId
+                    });
                 }
             }
 
+            // 4. Marcar todas las denuncias de esa publicación como resueltas
             await Denuncia.update(
                 { resuelta: true },
                 { where: { publicacion_id: publicacionId } },
@@ -169,5 +199,4 @@ module.exports = {
             res.status(500).send("Error interno al procesar la baja");
         }
     },
-
 };

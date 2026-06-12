@@ -17,35 +17,56 @@ const path = require("path");
 module.exports = {
     
     crearComentario: async (req, res) => {
-        try {
-            const publicacion_id = req.params.id;
-            const { comentario } = req.body; 
+    try {
+        const publicacion_id = req.params.id;
+        const { comentario } = req.body; 
 
-            const imagen = await Imagen.findOne({ where: { publicacion_id: publicacion_id } });
-            if (imagen && imagen.comentarios_abiertos === false) {
-                return res.status(403).send("Los comentarios están cerrados para esta publicación.");
-            }
-
-            await Comentario.create({
-                texto: comentario,
-                usuario_id: req.session.usuario.id,
-                publicacion_id: publicacion_id
-            });
-
-            res.redirect('/');
-        } catch (error) {
-            console.error("Error al comentar:", error);
-            res.status(500).send("Error interno");
+        const imagen = await Imagen.findOne({ where: { publicacion_id: publicacion_id } });
+        if (imagen && imagen.comentarios_abiertos === false) {
+            return res.status(403).send("Los comentarios están cerrados para esta publicación.");
         }
-    },
 
-    crearDenuncia: async (req, res) => {
+        await Comentario.create({
+            texto: comentario,
+            usuario_id: req.session.usuario.id,
+            publicacion_id: publicacion_id
+        });
+
+
+        const publicacion = await Publicacion.findByPk(publicacion_id);
+                
+        if (publicacion && publicacion.usuario_id !== req.session.usuario.id) {
+            await Notificacion.create({
+                tipo_evento: 'comentario',
+                mensaje: 'Ha comentado tu publicación.',
+                usuario_id: publicacion.usuario_id,
+                actor_id: req.session.usuario.id    
+            });
+        }
+
+        res.redirect('back'); 
+    } catch (error) {
+        console.error("Error al comentar:", error);
+        res.status(500).send("Error interno");
+    }
+},
+
+crearDenuncia: async (req, res) => {
         try {
             const publicacionId = req.params.id;
             const usuarioId = req.session.usuario.id;
             const { motivo, justificacion } = req.body;
 
             const { Denuncia, Publicacion } = require("../models");
+
+            // --- CÓDIGO NUEVO: Verificar que no sea el dueño ---
+            const publicacion = await Publicacion.findByPk(publicacionId);
+            if (!publicacion || publicacion.usuario_id === usuarioId) {
+                console.log("No puedes denunciar tu propia publicación.");
+                return res.redirect("/");
+            }
+            // ---------------------------------------------------
+
             const denunciaExistente = await Denuncia.findOne({
                 where: { publicacion_id: publicacionId, usuario_id: usuarioId },
             });
@@ -66,7 +87,7 @@ module.exports = {
                 { where: { id: publicacionId } },
             );
 
-            console.log(`Publicaion ${publicacionId} denunciada con exito.`);
+            console.log(`Publicación ${publicacionId} denunciada con éxito.`);
             res.redirect("/");
         } catch (error) {
             console.error("Error al crear la denuncia:", error);
