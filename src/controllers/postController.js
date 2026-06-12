@@ -125,7 +125,6 @@ module.exports = {
         }
     },
 
-
     buscarPublicaciones: async (req, res) => {
         try {
             const query = req.query.query || '';
@@ -261,6 +260,54 @@ module.exports = {
         }
     },
 
+    denunciarComentario: async (req, res) => {
+        try {
+            const comentarioId = req.params.id;
+            const comentario = await Comentario.findByPk(comentarioId);
+            
+            if (!comentario) return res.status(404).send("Comentario no encontrado");
+
+            const publicacion = await Publicacion.findByPk(comentario.publicacion_id);
+
+            if (publicacion.usuario_id === req.session.usuario.id || comentario.usuario_id === req.session.usuario.id) {
+                return res.redirect(req.get('Referrer') || '/');
+            }
+
+
+            await Notificacion.create({
+                tipo_evento: 'denuncia_comentario',
+                mensaje: `Han denunciado un comentario inapropiado en tu publicación "${publicacion.titulo}".`,
+                usuario_id: publicacion.usuario_id,
+                actor_id: req.session.usuario.id, // El que denunció
+                publicacion_id: publicacion.id,
+                comentario_id: comentario.id
+            });
+
+            res.redirect(req.get('Referrer') || '/');
+        } catch (error) {
+            console.error("Error al denunciar comentario:", error);
+            res.status(500).send("Error interno");
+        }
+    },
+
+    borrarComentario: async (req, res) => {
+        try {
+            const comentarioId = req.params.id;
+            const comentario = await Comentario.findByPk(comentarioId);
+            if (!comentario) return res.redirect('back');
+
+            const publicacion = await Publicacion.findByPk(comentario.publicacion_id);
+            
+            if (publicacion.usuario_id === req.session.usuario.id) {
+                await comentario.destroy();
+            }
+
+            res.redirect(req.get('Referrer') || '/');
+        } catch (error) {
+            console.error("Error al borrar comentario:", error);
+            res.status(500).send("Error interno");
+        }
+    }
 
 
 };

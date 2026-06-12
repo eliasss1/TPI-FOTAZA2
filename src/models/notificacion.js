@@ -8,7 +8,8 @@ const Notificacion = sequelize.define('Notificacion', {
         autoIncrement: true
     },
     tipo_evento: {
-        type: DataTypes.ENUM('comentario', 'valoracion', 'interes', 'seguimiento'),
+        // Agregamos 'denuncia_comentario' a la lista
+        type: DataTypes.ENUM('comentario', 'valoracion', 'interes', 'seguimiento', 'denuncia_comentario'),
         allowNull: false
     },
     mensaje: {
@@ -19,12 +20,14 @@ const Notificacion = sequelize.define('Notificacion', {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-
     publicacion_id: {
         type: DataTypes.INTEGER,
         allowNull: true
+    },
+    comentario_id: { 
+        type: DataTypes.INTEGER,
+        allowNull: true
     }
-
 }, {
     tableName: 'notificaciones'
 });

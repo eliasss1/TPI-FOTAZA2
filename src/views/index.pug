@@ -138,16 +138,23 @@ block content
                                                 div.d-flex.flex-column.p-2.overflow-auto(style="min-height: 150px; max-height: 500px")
                                                     if publicacion.comentarios && publicacion.comentarios.length > 0
                                                         each comentario in publicacion.comentarios
-                                                            div.gap-2.border-bottom.border-1.p-2
-                                                                .row
-                                                                    strong.col-md-2 #{comentario.autor.username}
-                                                                    p.col-md-7.card-text.text-muted.text-truncate.small #{comentario.texto}   
-                                                                    button.col-md-1.btn.btn-outline-danger.border-0.btn-sm.position-relative(type="button")
-                                                                        img.pb-1(src="/images/bandera.png" style="height: 15px; width: 15px")
-                                                                    if publicacion.usuario_id == usuario.id
+                                                            div.gap-2.border-bottom.border-1.p-2(id=`comentario-${comentario.id}`)
+                                                                .row.align-items-center
+                                                                    strong.col-md-3.text-truncate #{comentario.autor.username}
+                                                                    p.col-md-6.card-text.text-muted.small.mb-0(style="white-space: normal;") #{comentario.texto} 
+                                                                    
+                                                                    div.col-md-3.d-flex.justify-content-end.gap-1
+                                                                        //- Botón de denunciar (solo si no es tuyo y no eres el dueño de la foto)
+                                                                        if comentario.usuario_id !== usuario.id && publicacion.usuario_id !== usuario.id
+                                                                            form.m-0(action=`/comentario/denunciar/${comentario.id}` method="POST")
+                                                                                button.btn.btn-outline-warning.border-0.btn-sm(type="submit" title="Denunciar comentario" onclick="return confirm('¿Denunciar este comentario a su autor?');")
+                                                                                    img(src="/images/bandera.png" style="height: 15px; width: 15px")
                                                                         
-                                                                        button.col-md-1.ms-1.btn.btn-outline-danger.btn-sm.position-relative(type="button")
-                                                                            i.bi.bi-trash-fill
+                                                                        //- Botón de borrar (solo para el autor de la publicación)
+                                                                        if publicacion.usuario_id == usuario.id
+                                                                            form.m-0(action=`/comentario/borrar/${comentario.id}` method="POST")
+                                                                                button.btn.btn-outline-danger.btn-sm(type="submit" title="Eliminar comentario" onclick="return confirm('¿Estás seguro de que deseas eliminar este comentario?');")
+                                                                                    i.bi.bi-trash-fill
 
                                                 div.border-top.border-1.p-1
                                                     form.d-flex.gap-1(action=`/comentar/${publicacion.id}` method="POST")
