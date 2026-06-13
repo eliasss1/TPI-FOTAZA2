@@ -73,6 +73,12 @@ block content
                                     div.position-relative.overflow-hidden.rounded-3
                                         if publicacion.imagenes && publicacion.imagenes[0]
                                             img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 240px; width: 100%;")
+                                            
+                                            // BOTON TRANSPARENTE SI HAY MAS DE 1 IMAGEN
+                                            if publicacion.imagenes.length > 1
+                                                button.btn.btn-dark.btn-sm.position-absolute.top-0.end-0.m-2.opacity-75.shadow(type="button" data-bs-toggle="modal" data-bs-target=`#modalGaleria-${publicacion.id}` title="Ver todas las imágenes")
+                                                    i.bi.bi-images.text-white
+                                                    span.ms-1.text-white.fw-bold +#{publicacion.imagenes.length - 1}
                                         else
                                             img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 240px; width: 100%;")
 
@@ -297,6 +303,12 @@ block content
                                         div.position-relative.overflow-hidden.rounded-3
                                             if publicacion.imagenes && publicacion.imagenes[0]
                                                 img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 240px; width: 100%;")
+                                                
+                                                // BOTON TRANSPARENTE SI HAY MAS DE 1 IMAGEN
+                                                if publicacion.imagenes.length > 1
+                                                    button.btn.btn-dark.btn-sm.position-absolute.top-0.end-0.m-2.opacity-75.shadow(type="button" data-bs-toggle="modal" data-bs-target=`#modalGaleria-${publicacion.id}` title="Ver todas las imágenes")
+                                                        i.bi.bi-images.text-white
+                                                        span.ms-1.text-white.fw-bold +#{publicacion.imagenes.length - 1}
                                             else
                                                 img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 240px; width: 100%;")
 
