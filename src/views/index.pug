@@ -44,6 +44,12 @@ block content
                                 div.position-relative.overflow-hidden.rounded-3
                                     if publicacion.imagenes && publicacion.imagenes[0]
                                         img.card-img-top.img-fluid(src=publicacion.imagenes[0].url_path alt=publicacion.titulo style="object-fit: cover; height: 240px; width: 100%;")
+                                        
+                                        // BOTON TRANSPARENTE SI HAY MAS DE 1 IMAGEN
+                                        if publicacion.imagenes.length > 1
+                                            button.btn.btn-dark.btn-sm.position-absolute.top-0.end-0.m-2.opacity-75.shadow(type="button" data-bs-toggle="modal" data-bs-target=`#modalGaleria-${publicacion.id}` title="Ver todas las imágenes")
+                                                i.bi.bi-images.text-white
+                                                span.ms-1.text-white.fw-bold +#{publicacion.imagenes.length - 1}
                                     else
                                         img.card-img-top.img-fluid(src="https://picsum.photos/400/300" alt="Fotaza 2" style="object-fit: cover; height: 240px; width: 100%;")
 
@@ -241,7 +247,20 @@ block content
                                                             input.form-check-input(type="checkbox" role="switch" name="comentarios_abiertos" id=`switchComentarios-${publicacion.id}` checked=(publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos !== false))
                                                             label.form-check-label(for=`switchComentarios-${publicacion.id}`) Permitir comentarios en esta foto
                                                         
-                                                        button.btn.btn-primary.w-100(type="submit") Guardar Cambios                    
+                                                        button.btn.btn-primary.w-100(type="submit") Guardar Cambios
+                                // VENTANITA MODAL GALERIA DE IMAGENES
+                                if publicacion.imagenes && publicacion.imagenes.length > 1
+                                    div.modal.fade(id=`modalGaleria-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                        div.modal-dialog.modal-dialog-centered.modal-lg
+                                            div.modal-content.border-0.shadow-lg.bg-dark
+                                                div.modal-header.border-0.p-2.d-flex.justify-content-end
+                                                    button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+                                                div.modal-body.p-3
+                                                    // Contenedor que empuja las fotos una al lado de la otra
+                                                    div.d-flex.gap-3.overflow-auto.pb-3(style="white-space: nowrap; overflow-y: hidden;")
+                                                        each img in publicacion.imagenes
+                                                            div.flex-shrink-0(style="width: 350px;")
+                                                                img.img-fluid.rounded-2.shadow-sm(src=img.url_path alt="Galeria" style="object-fit: cover; height: 350px; width: 100%;")                    
 
             else
                 div.col-12.text-center.py-5.my-auto

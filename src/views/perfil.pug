@@ -260,6 +260,19 @@ block content
                                                             label.form-check-label(for=`switchComentarios-${publicacion.id}`) Permitir comentarios en esta foto
                                                         
                                                         button.btn.btn-primary.w-100(type="submit") Guardar Cambios
+                                // VENTANITA MODAL GALERIA DE IMAGENES
+                                if publicacion.imagenes && publicacion.imagenes.length > 1
+                                    div.modal.fade(id=`modalGaleria-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                        div.modal-dialog.modal-dialog-centered.modal-lg
+                                            div.modal-content.border-0.shadow-lg.bg-dark
+                                                div.modal-header.border-0.p-2.d-flex.justify-content-end
+                                                    button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+                                                div.modal-body.p-3
+                                                    // Contenedor que empuja las fotos una al lado de la otra
+                                                    div.d-flex.gap-3.overflow-auto.pb-3(style="white-space: nowrap; overflow-y: hidden;")
+                                                        each img in publicacion.imagenes
+                                                            div.flex-shrink-0(style="width: 350px;")
+                                                                img.img-fluid.rounded-2.shadow-sm(src=img.url_path alt="Galeria" style="object-fit: cover; height: 350px; width: 100%;")
                     else
                         div.col-12.text-center.py-5.my-auto
                             i.bi.bi-camera.text-secondary.opacity-25(style="font-size: 4rem;")
@@ -450,6 +463,19 @@ block content
                                                                     each coleccion in misColecciones
                                                                         option(value=coleccion.id)= coleccion.nombre
                                                             button.btn.btn-outline-primary.w-100(type="submit") Guardar en Seleccionadas
+                                    // VENTANITA MODAL GALERIA DE IMAGENES
+                                    if publicacion.imagenes && publicacion.imagenes.length > 1
+                                        div.modal.fade(id=`modalGaleria-${publicacion.id}` tabindex="-1" aria-hidden="true")
+                                            div.modal-dialog.modal-dialog-centered.modal-lg
+                                                div.modal-content.border-0.shadow-lg.bg-dark
+                                                    div.modal-header.border-0.p-2.d-flex.justify-content-end
+                                                        button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Cerrar")
+                                                    div.modal-body.p-3
+                                                        // Contenedor que empuja las fotos una al lado de la otra
+                                                        div.d-flex.gap-3.overflow-auto.pb-3(style="white-space: nowrap; overflow-y: hidden;")
+                                                            each img in publicacion.imagenes
+                                                                div.flex-shrink-0(style="width: 350px;")
+                                                                    img.img-fluid.rounded-2.shadow-sm(src=img.url_path alt="Galeria" style="object-fit: cover; height: 350px; width: 100%;")
 
                         else
                             div.col-12.text-center.py-5.my-auto
