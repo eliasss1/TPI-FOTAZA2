@@ -38,6 +38,7 @@ Para ejecutar este proyecto en tu entorno local, sigue estrictamente los siguien
    - Crea un archivo llamado .env en la raíz del proyecto y copia las variables definidas en el archivo .env.example. Configura allí los datos correspondientes a tu base de datos local y los puertos.
 
 4. **Inicializar la base de datos (creación de tablas)**
+- El proyecto cuenta con un mecanismo automatizado y una copia de seguridad para desplegar la base de datos rápidamente y poder probar el sistema completo:
     ```bash
     npm run db:init
 
