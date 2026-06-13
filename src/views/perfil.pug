@@ -89,7 +89,11 @@ block content
 
                                         //Título
                                         div.d-flex.justify-content-between.align-items-center.mb-1
-                                            h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
+                                            div.d-flex.align-items-center.gap-2
+                                                h5.card-title.text-truncate.mb-0.fw-bold= publicacion.titulo
+                                                if usuario && usuario.id === publicacion.usuario_id && !publicacion.bloquear_edicion
+                                                    button.btn.btn-sm.btn-link.p-0.text-secondary(type="button" data-bs-toggle="modal" data-bs-target=`#modalEditar-${publicacion.id}`)
+                                                        i.bi.bi-pencil-fill
 
                                         //Valoracion
                                         div.d-flex.align-items-center.gap-1.mb-2
@@ -241,6 +245,21 @@ block content
                                                                     option(value=coleccion.id)= coleccion.nombre
                                                         button.btn.btn-outline-primary.w-100(type="submit") Guardar en Seleccionadas
 
+                                // VENTANITA MODAL PARA EDITAR PUBLICACION (Solo autor)
+                                if usuario && usuario.id === publicacion.usuario_id && !publicacion.bloquear_edicion
+                                    div.modal.fade(id=`modalEditar-${publicacion.id}`)
+                                        div.modal-dialog.modal-dialog-centered
+                                            div.modal-content.border-0.shadow-lg
+                                                div.modal-header.bg-light.border-0
+                                                    h5.modal-title Editar Publicación
+                                                    button.btn-close(data-bs-dismiss="modal")
+                                                div.modal-body
+                                                    form(action=`/publicaciones/editar/${publicacion.id}` method="POST")
+                                                        div.form-check.form-switch.mb-4
+                                                            input.form-check-input(type="checkbox" role="switch" name="comentarios_abiertos" id=`switchComentarios-${publicacion.id}` checked=(publicacion.imagenes && publicacion.imagenes[0] && publicacion.imagenes[0].comentarios_abiertos !== false))
+                                                            label.form-check-label(for=`switchComentarios-${publicacion.id}`) Permitir comentarios en esta foto
+                                                        
+                                                        button.btn.btn-primary.w-100(type="submit") Guardar Cambios
                     else
                         div.col-12.text-center.py-5.my-auto
                             i.bi.bi-camera.text-secondary.opacity-25(style="font-size: 4rem;")

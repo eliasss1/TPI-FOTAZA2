@@ -343,6 +343,37 @@ module.exports = {
             console.error("Error al borrar comentario:", error);
             res.status(500).send("Error interno");
         }
+    },
+
+    editarPublicacion: async (req, res) => {
+        try {
+            const publicacion_id = req.params.id;
+            const usuario_id = req.session.usuario.id;
+
+            const { comentarios_abiertos } = req.body; 
+
+            const { Publicacion, Imagen } = require("../models");
+
+            const publicacion = await Publicacion.findByPk(publicacion_id);
+
+            
+            if (!publicacion || publicacion.usuario_id !== usuario_id || publicacion.bloquear_edicion) {
+                return res.redirect('/');
+            }
+
+            const estanAbiertos = comentarios_abiertos === 'on';
+
+            await Imagen.update(
+                { comentarios_abiertos: estanAbiertos },
+                { where: { publicacion_id: publicacion_id } }
+            );
+
+            
+            res.redirect(req.get('Referrer') || '/');
+        } catch (error) {
+            console.error("Error al editar:", error);
+            res.status(500).send("Error interno");
+        }
     }
 
 

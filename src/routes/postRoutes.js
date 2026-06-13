@@ -27,6 +27,7 @@ router.post('/valorar/:id', estaAutenticado, postController.valorarPublicacion);
 router.post('/publicaciones/interes/:id', estaAutenticado, postController.registrarInteres);
 router.post('/comentario/denunciar/:id', estaAutenticado, postController.denunciarComentario);
 router.post('/comentario/borrar/:id', estaAutenticado, postController.borrarComentario);
+router.post('/publicaciones/editar/:id', estaAutenticado, postController.editarPublicacion);
 
 //RUTAS MODERACION
 router.get('/moderacion', estaAutenticado, esModerador, moderacionController.mostrarModeracion);
