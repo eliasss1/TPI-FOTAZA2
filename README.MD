@@ -11,7 +11,7 @@
 ## 📌 Enlaces del Proyecto
 * **Repositorio en GitHub:** https://github.com/eliasss1/TPI-FOTAZA2.git
 * **Aplicación en Producción (Vercel):** https://tpi-fotaza-2-lime.vercel.app/
-* **Video Demostrativo:** [PEGAR_AQUI_URL_VIDEO]
+* **Video Demostrativo:** 
 
 ## 🛠️ Tecnologías Utilizadas
 * **Backend:** Node.js, Express
