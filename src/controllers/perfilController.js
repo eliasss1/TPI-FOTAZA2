@@ -94,9 +94,7 @@ module.exports = {
                         },
                     ],
                     order: [["createdAt", "DESC"]]
-                });
-
-                // 👇 AGREGA ESTE BUCLE AQUÍ 👇
+                });              
                 for (let pub of publicacionesSeguidos) {
                     const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
                     pub.dataValues.cantidadVotos = votos.length;
