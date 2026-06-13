@@ -350,7 +350,7 @@ module.exports = {
             const publicacion_id = req.params.id;
             const usuario_id = req.session.usuario.id;
 
-            const { comentarios_abiertos } = req.body; 
+            const comentarios_abiertos = req.body ? req.body.comentarios_abiertos : undefined; 
 
             const { Publicacion, Imagen } = require("../models");
 
