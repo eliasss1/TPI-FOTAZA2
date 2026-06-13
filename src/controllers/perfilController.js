@@ -79,22 +79,31 @@ module.exports = {
             const idsSeguidos = usuarioPerfil.Seguidos ? usuarioPerfil.Seguidos.map(u => u.id) : [];
 
             const publicacionesSeguidos = await Publicacion.findAll({
-                where: {
-                    usuario_id: idsSeguidos,
-                    bajada: { [Op.not]: true }
-                },
-                include: [
-                    { model: Usuario, as: "autor", attributes: ["username"] },
-                    { model: Imagen, as: "imagenes", required: true },
-                    { model: Etiqueta, as: "etiquetas" },
-                    { 
-                        model: Comentario, 
-                        as: "comentarios", 
-                        include: [{ model: Usuario, as: "autor" }] 
+                    where: {
+                        usuario_id: idsSeguidos,
+                        bajada: { [Op.not]: true }
                     },
-                ],
-                order: [["createdAt", "DESC"]]
-            });
+                    include: [
+                        { model: Usuario, as: "autor", attributes: ["username"] },
+                        { model: Imagen, as: "imagenes", required: true },
+                        { model: Etiqueta, as: "etiquetas" },
+                        { 
+                            model: Comentario, 
+                            as: "comentarios", 
+                            include: [{ model: Usuario, as: "autor" }] 
+                        },
+                    ],
+                    order: [["createdAt", "DESC"]]
+                });
+
+                // 👇 AGREGA ESTE BUCLE AQUÍ 👇
+                for (let pub of publicacionesSeguidos) {
+                    const votos = await Valoracion.findAll({ where: { publicacion_id: pub.id } });
+                    pub.dataValues.cantidadVotos = votos.length;
+                    pub.dataValues.promedioValoracion = votos.length > 0
+                        ? (votos.reduce((acc, v) => acc + v.puntos, 0) / votos.length).toFixed(1)
+                        : "0.0";
+                }
 
             res.render("perfil", {
                 titulo: `Perfil de ${usuarioPerfil.username}`,
